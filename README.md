@@ -1,4 +1,4 @@
-# carDoon :leafy_green: 
+# caRdoon :leafy_green: 
 
 A task queue API for R roughly based on functionality of celery.
 
