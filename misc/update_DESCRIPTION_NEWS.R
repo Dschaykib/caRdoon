@@ -41,12 +41,13 @@ my_desc$set("Authors@R",
                    "role = c('cre', 'aut'))"))
 
 # set R version
-my_desc$set_dep("R", type = desc::dep_types[2])
+#my_desc$set_dep("R", type = desc::dep_types[2])
 
 # set suggests
 my_desc$set_dep("testthat", type = desc::dep_types[3], version = "*")
 my_desc$set_dep("origin", type = desc::dep_types[3], version = "*")
 my_desc$set_dep("newsmd", type = desc::dep_types[3], version = "*")
+my_desc$set_dep("httr", type = desc::dep_types[3])
 
 # set dependencies
 my_desc$set_dep("R6", type = desc::dep_types[1])

@@ -5,6 +5,10 @@
 #'
 #' @param port integer with the port, the API should run on
 #'
+#' @import R6
+#' @import plumber
+#' @import callr
+#'
 #' @return a message, that the API has closed
 #' @export
 #'
@@ -15,7 +19,7 @@ run_cardoon <- function(port = 9662) {
   # TODO check put this blog for plumber package structure
   # https://community.rstudio.com/t/plumber-api-and-package-structure/18099/11
 
-  plumber::pr("R/cardoon_api.R") %>%
+  plumber::pr(file.path("R", "cardoon_api.R")) %>%
     plumber::pr_run(
       # manually set port
       port = port,

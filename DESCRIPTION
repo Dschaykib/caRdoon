@@ -8,13 +8,12 @@ Description: Contains an API to create a task queue overview.
 License: MIT + file LICENSE
 URL: https://github.com/Dschaykib/caRdoon
 BugReports: https://github.com/Dschaykib/caRdoon/issues
-Depends: 
-    R
 Imports: 
     callr,
     plumber,
     R6
 Suggests: 
+    httr,
     newsmd,
     origin,
     testthat
