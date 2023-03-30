@@ -1,0 +1,22 @@
+Package: caRdoon
+Title: A task queue API for R
+Version: 0.0.0.9001
+Date: 2023-03-30
+Authors@R: 
+    person("Jakob", "Gepp", , "jakob.gepp@yahoo.de", role = c("cre", "aut"))
+Description: Contains an API to create a task queue overview.
+License: MIT + file LICENSE
+URL: https://github.com/Dschaykib/caRdoon
+BugReports: https://github.com/Dschaykib/caRdoon/issues
+Depends: 
+    R
+Imports: 
+    callr,
+    plumber,
+    R6
+Suggests: 
+    newsmd,
+    origin,
+    testthat
+Encoding: UTF-8
+RoxygenNote: 7.2.3
