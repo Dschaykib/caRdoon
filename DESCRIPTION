@@ -1,6 +1,6 @@
 Package: caRdoon
 Title: A task queue API for R
-Version: 0.0.0.9002
+Version: 0.0.0.9003
 Date: 2023-04-03
 Authors@R: 
     person("Jakob", "Gepp", , "jakob.gepp@yahoo.de", role = c("cre", "aut"))

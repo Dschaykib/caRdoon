@@ -68,7 +68,15 @@ my_news$add_bullet(c("add newsmd for easier creation",
                      "add API code "))
 
 
-# fix testing -------------------------------------------------------
+# fix testing -------------------------------------------------------------
+
+my_desc$bump_version("dev")
+my_news$add_version(my_desc$get_version())
+
+my_news$add_bullet(c("fix testing setup",
+                     "update documentation"))
+
+# change port and worker handling -----------------------------------------
 
 my_desc$bump_version("dev")
 my_news$add_version(my_desc$get_version())

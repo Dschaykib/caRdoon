@@ -1,3 +1,10 @@
+## version 0.0.0.9003
+
+---
+
+- fix testing setup
+- update documentation
+
 ## version 0.0.0.9002
 
 ---
