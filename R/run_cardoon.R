@@ -4,6 +4,7 @@
 #' The API acts as a task queue with multiple workers in the background.
 #'
 #' @param port integer with the port, the API should run on
+#' @param num_worker integer with number of worker processes
 #' @param docs a boolean indicating if the docs should be started
 #'
 #' @import R6
@@ -16,12 +17,19 @@
 #'
 run_cardoon <- function(
     port = 9662,
+    num_worker = 1,
     docs = FALSE) {
   # TODO add logging wihtin API on different levels (info, debug, ...)
   # TODO add number of worker as parameter
   # TODO add API path for background process
   # TODO check put this blog for plumber package structure
   # https://community.rstudio.com/t/plumber-api-and-package-structure/18099/11
+
+
+  # set the API port and number of workers as a global env, so that the
+  # underlying background process knows which port to use
+  Sys.setenv(CARDOON_PORT = port)
+  Sys.setenv(NUM_WORKER = num_worker)
 
 # path_fkt <- file.path(system.file(package = "caRdoon"),
 #                       "R", "cardoon_api.R")

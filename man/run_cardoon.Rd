@@ -4,10 +4,12 @@
 \alias{run_cardoon}
 \title{Start up caRdoon API}
 \usage{
-run_cardoon(port = 9662, docs = FALSE)
+run_cardoon(port = 9662, num_worker = 1, docs = FALSE)
 }
 \arguments{
 \item{port}{integer with the port, the API should run on}
+
+\item{num_worker}{integer with number of worker processes}
 
 \item{docs}{a boolean indicating if the docs should be started}
 }

@@ -73,7 +73,8 @@ my_news$add_bullet(c("add newsmd for easier creation",
 my_desc$bump_version("dev")
 my_news$add_version(my_desc$get_version())
 
-my_news$add_bullet(c("fix testing setup"))
+my_news$add_bullet(c("fix testing setup",
+                     "update documentation"))
 
 # WIP ---------------------------------------------------------------------
 

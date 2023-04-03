@@ -1,7 +1,11 @@
 api_version <- "0.0.0.9002"
 # this need to be in the first line, since it is updated automatically
 
-API_PATH <- "http://127.0.0.1:9662"
+# loads the port from the global env, which was set within run_cardoon()
+API_PATH <- paste0("http://127.0.0.1:", Sys.getenv("CARDOON_PORT", "8000"))
+
+# get number of worker
+num_worker <- as.integer(Sys.getenv("NUM_WORKER", "1"))
 
 
 # background process ------------------------------------------------------
@@ -50,7 +54,7 @@ rp1 <- callr::r_bg(
 task_q <- R6::R6Class(
   "task_q",
   public = list(
-    initialize = function(concurrency = 1L) {
+    initialize = function(concurrency = num_worker) {
       private$start_workers(concurrency)
       invisible(self)
     },

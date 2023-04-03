@@ -6,6 +6,17 @@ A task queue API for R roughly based on functionality of [celery](https://github
 
 Source: [Wikipedia](https://en.wikipedia.org/wiki/Cardoon)
 
+# Dislaimer
+
+This is still work in progress and functionality, parameters and such might change.
+
+# Installation
+
+``` R
+# with renv from GitHub
+renv::install("Dschaykib/caRdoon")
+library(caRdoon)
+```
 
 # Motivation
 
@@ -18,6 +29,45 @@ The target setup looks like this:
 <img src="misc/target-setup.png" align="center" />
 
 
+# Usage
+
+The package provides the setup described above. To start the local API use the function `run_cardoon(port = 8000)` and specify the port, the API should run at.
+The main endpoints are:
+
+#### /addJob
+
+This will add a new job to the task list. The added job is a function `func` which needs all parameter given via `args_list`. Since the process is spawned in a separate R process in the background, it does not have access to the global environment.
+
+For example:
+
+``` R
+# create a function
+foo <- function(id = 1, msg = "done") {
+  Sys.sleep(runif(1))
+  out_file <- paste0("logs_", gsub(":", "", Sys.time()), "_id_", id)
+  writeLines(text = paste(id, msg), con = out_file)
+}
+
+this_body <- jsonlite::toJSON(list(
+  "func" = foo,
+  "args_list" = list(
+    "id" =  1,
+    "msg" = "finished"
+    
+  )
+))
+
+httr::POST(url = "http://127.0.0.1:8000/addJob",
+           body = this_body)
+
+```
+
+#### /tasklist
+
+This will return a table with the current jobs and their status.
+
+
+
 # Ideas
 
 First a small working package is planed, but there are already ideas floating around for improvements and enhancements. For example:
@@ -25,6 +75,7 @@ First a small working package is planed, but there are already ideas floating ar
 - [ ] adding a file/DB to store results
 - [ ] integrate testing
 - [ ] provide docker container
+- [ ] add priority for tasks
 - [ ] ...
 
 
