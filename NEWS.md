@@ -1,3 +1,9 @@
+## version 0.0.0.9004
+
+---
+
+- add env vars sleep_time and check_seconds
+
 ## version 0.0.0.9003
 
 ---

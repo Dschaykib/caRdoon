@@ -1,17 +1,25 @@
-api_version <- "0.0.0.9003"
+api_version <- "0.0.0.9004"
 # this need to be in the first line, since it is updated automatically
 
 # loads the port from the global env, which was set within run_cardoon()
-API_PATH <- paste0("http://127.0.0.1:", Sys.getenv("CARDOON_PORT", "8000"))
+api_path <- paste0("http://127.0.0.1:", Sys.getenv("CARDOON_PORT", "8000"))
 
 # get number of worker
-num_worker <- as.integer(Sys.getenv("NUM_WORKER", "1"))
+num_worker <- as.integer(Sys.getenv("CARDOON_NUM_WORKER", "1"))
+# get values for background process
+check_seconds <- as.integer(Sys.getenv("CARDOON_CHECK_SECONDS", "60"))
+sleep_time <- as.integer(Sys.getenv("CARDOON_SLEEP_TIME", "10"))
 
 
 # background process ------------------------------------------------------
 
-rp1 <- callr::r_bg(
-  func = function(api_path) {
+# TODO remove into helper script?
+rbg_nextjob <- callr::r_bg(
+  # TODO change logging file to parameter
+  stdout = "bg.txt",
+  func = function(api_path, check_seconds = 60, sleep_time = 10) {
+
+    print("initialise caRdoon background process")
     # setup time to initialize API
     Sys.sleep(2)
     # setup to check if API is still running
@@ -24,12 +32,13 @@ rp1 <- callr::r_bg(
     is_alive <- TRUE
     start_time <- Sys.time()
     # seconds between is_alive checks
-    check_seconds <- 60
+    # check_seconds <- 60
     # seconds between API calls
-    sleep_time <- 10
+    # sleep_time <- 10
 
 
     # loop for constant checks, to keep process updating
+    print("start caRdoon background process loop")
     while(is_alive) {
       Sys.sleep(sleep_time)
       check <- tryCatch({httr::GET(paste0(api_path, "/nextJob"))},
@@ -45,8 +54,11 @@ rp1 <- callr::r_bg(
       }
 
     }
+    print("end caRdoon background process loop")
   },
-  args = list(api_path = API_PATH))
+  args = list(api_path = api_path,
+              check_seconds = check_seconds,
+              sleep_time = sleep_time))
 
 # Task queue --------------------------------------------------------------
 
@@ -70,9 +82,10 @@ task_q <- R6::R6Class(
       if (is.null(id)) id <- private$get_next_id()
       if (id %in% private$tasks$id) stop("Duplicate task id")
       before <- which(private$tasks$idle)[1]
-      private$tasks <- tibble::add_row(private$tasks, .before = before,
-                                       id = id, idle = FALSE, state = "waiting", fun = list(fun),
-                                       args = list(args), worker = list(NULL), result = list(NULL))
+      private$tasks <- tibble::add_row(
+        private$tasks, .before = before,
+        id = id, idle = FALSE, state = "waiting", fun = list(fun),
+        args = list(args), worker = list(NULL), result = list(NULL))
       private$schedule()
       invisible(id)
     },
@@ -120,10 +133,11 @@ task_q <- R6::R6Class(
         fun = list(), args = list(), worker = list(), result = list())
       for (i in seq_len(concurrency)) {
         rs <- callr::r_session$new(wait = FALSE)
-        private$tasks <- tibble::add_row(private$tasks,
-                                         id = paste0(".idle-", i), idle = TRUE, state = "running",
-                                         fun = list(NULL), args = list(NULL), worker = list(rs),
-                                         result = list(NULL))
+        private$tasks <- tibble::add_row(
+          private$tasks,
+          id = paste0(".idle-", i), idle = TRUE, state = "running",
+          fun = list(NULL), args = list(NULL), worker = list(rs),
+          result = list(NULL))
       }
     },
 
@@ -174,10 +188,12 @@ function(req) {
   data <- req$argsBody
   func <- eval(parse(text = data$func))
 
-  q$push(fun = func, args = data$args_list)
-
-  print("done addJob")
-
+  if (is.null(func)) {
+    print("no function found in $func")
+  } else {
+    q$push(fun = func, args = data$args_list)
+    print("done addJob")
+  }
 }
 
 
@@ -202,6 +218,14 @@ function(){
   return(TRUE)
 }
 
+#* Return version
+#* @get /version
+function(){
+  cat("Version:", api_version, "\n")
+  return(api_version)
+}
+
+rbg_nextjob$read_all_output_lines()
 
 # update API documentation
 #* @plumber

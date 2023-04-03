@@ -4,12 +4,22 @@
 \alias{run_cardoon}
 \title{Start up caRdoon API}
 \usage{
-run_cardoon(port = 9662, num_worker = 1, docs = FALSE)
+run_cardoon(
+  port = 9662,
+  num_worker = 1,
+  check_seconds = 60,
+  sleep_time = 10,
+  docs = FALSE
+)
 }
 \arguments{
 \item{port}{integer with the port, the API should run on}
 
 \item{num_worker}{integer with number of worker processes}
+
+\item{check_seconds}{integer with number of seconds before the background process checks if the API is still alive}
+
+\item{sleep_time}{integer with the number of seconds the background process sleeps}
 
 \item{docs}{a boolean indicating if the docs should be started}
 }

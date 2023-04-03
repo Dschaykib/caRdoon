@@ -84,6 +84,13 @@ my_news$add_version(my_desc$get_version())
 my_news$add_bullet(c("fix testing setup",
                      "update documentation"))
 
+# add env settings --------------------------------------------------------
+
+my_desc$bump_version("dev")
+my_news$add_version(my_desc$get_version())
+
+my_news$add_bullet(c("add env vars sleep_time and check_seconds"))
+
 # WIP ---------------------------------------------------------------------
 
 # bump dev version
@@ -128,3 +135,4 @@ origin::originize_pkg()
 roxygen2::roxygenise()
 # tidy DESCRIPTON
 usethis::use_tidy_description()
+

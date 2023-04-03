@@ -1,4 +1,4 @@
-# :leafy_green: caRdoon - 0.0.0.9003 <img src="misc/cardoon.png" width=170 align="right" />
+# :leafy_green: caRdoon - 0.0.0.9004 <img src="misc/cardoon.png" width=170 align="right" />
 
 A task queue API for R roughly based on functionality of [celery](https://github.com/celery/celery).
 
@@ -68,7 +68,7 @@ This will return a table with the current jobs and their status.
 
 
 
-# Ideas
+# Ideas and TODOs
 
 First a small working package is planed, but there are already ideas floating around for improvements and enhancements. For example:
 
@@ -76,6 +76,8 @@ First a small working package is planed, but there are already ideas floating ar
 - [ ] integrate testing
 - [ ] provide docker container
 - [ ] add priority for tasks
+- [ ] add logging within API and output files
+- [ ] check error handling
 - [ ] ...
 
 

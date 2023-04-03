@@ -5,6 +5,8 @@
 #'
 #' @param port integer with the port, the API should run on
 #' @param num_worker integer with number of worker processes
+#' @param check_seconds integer with number of seconds before the background process checks if the API is still alive
+#' @param sleep_time integer with the number of seconds the background process sleeps
 #' @param docs a boolean indicating if the docs should be started
 #'
 #' @import R6
@@ -18,6 +20,8 @@
 run_cardoon <- function(
     port = 9662,
     num_worker = 1,
+    check_seconds = 60,
+    sleep_time = 10,
     docs = FALSE) {
   # TODO add logging wihtin API on different levels (info, debug, ...)
   # TODO add number of worker as parameter
@@ -29,7 +33,9 @@ run_cardoon <- function(
   # set the API port and number of workers as a global env, so that the
   # underlying background process knows which port to use
   Sys.setenv(CARDOON_PORT = port)
-  Sys.setenv(NUM_WORKER = num_worker)
+  Sys.setenv(CARDOON_NUM_WORKER = num_worker)
+  Sys.setenv(CARDOON_CHECK_SECONDS = check_seconds)
+  Sys.setenv(CARDOON_SLEEP_TIME = sleep_time)
 
 # path_fkt <- file.path(system.file(package = "caRdoon"),
 #                       "R", "cardoon_api.R")
