@@ -1,4 +1,4 @@
-api_version <- "0.0.0.9001"
+api_version <- "0.0.0.9002"
 # this need to be in the first line, since it is updated automatically
 
 API_PATH <- "http://127.0.0.1:9662"

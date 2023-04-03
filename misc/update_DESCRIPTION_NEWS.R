@@ -47,12 +47,15 @@ my_desc$set("Authors@R",
 my_desc$set_dep("testthat", type = desc::dep_types[3], version = "*")
 my_desc$set_dep("origin", type = desc::dep_types[3], version = "*")
 my_desc$set_dep("newsmd", type = desc::dep_types[3], version = "*")
-my_desc$set_dep("httr", type = desc::dep_types[3])
 
 # set dependencies
 my_desc$set_dep("R6", type = desc::dep_types[1])
 my_desc$set_dep("plumber", type = desc::dep_types[1])
 my_desc$set_dep("callr", type = desc::dep_types[1])
+my_desc$set_dep("httr", type = desc::dep_types[1])
+
+# set staging setting
+my_desc$set("StagedInstall", "no")
 
 
 
@@ -65,6 +68,12 @@ my_news$add_bullet(c("add newsmd for easier creation",
                      "add API code "))
 
 
+# fix testing -------------------------------------------------------
+
+my_desc$bump_version("dev")
+my_news$add_version(my_desc$get_version())
+
+my_news$add_bullet(c("fix testing setup"))
 
 # WIP ---------------------------------------------------------------------
 
@@ -81,10 +90,10 @@ my_desc$write(file = "DESCRIPTION")
 my_news$write(file = "NEWS.md")
 
 # set API version
-cardoon_api_file <- readLines("R/cardoon_api.R")
+cardoon_api_file <- readLines("inst/plumber/cardoon/plumber.R")
 cardoon_api_file[1] <- paste0(
   'api_version <- "', my_desc$get_version(), '"')
-writeLines(cardoon_api_file, "R/cardoon_api.R")
+writeLines(cardoon_api_file, "inst/plumber/cardoon/plumber.R")
 
 # set CRAN version number in README
 my_readme <- readLines("README.md")

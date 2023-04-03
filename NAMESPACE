@@ -3,4 +3,5 @@
 export(run_cardoon)
 import(R6)
 import(callr)
+import(httr)
 import(plumber)
