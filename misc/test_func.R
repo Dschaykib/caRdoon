@@ -2,7 +2,7 @@ foo <- function(
     id = 1,
     msg = "done") {
   Sys.sleep(runif(1))
-  out_file <- paste0("/Users/jakobgepp/Projekte/2022/BS Energy/App Performance/API-test/Logs/logs_",
+  out_file <- paste0("/Users/jakobgepp/Projekte/Intern/caRdoon/logs_",
                      gsub(":", "", Sys.time()), "_id_", id)
   writeLines(text = paste(id, msg), con = out_file)
 

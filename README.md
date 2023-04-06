@@ -78,6 +78,7 @@ First a small working package is planed, but there are already ideas floating ar
 - [ ] add priority for tasks
 - [ ] add logging within API and output files
 - [ ] check error handling
+- [ ] remove dependencies
 - [ ] ...
 
 

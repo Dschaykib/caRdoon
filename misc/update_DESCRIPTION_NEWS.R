@@ -55,7 +55,7 @@ my_desc$set_dep("callr", type = desc::dep_types[1])
 my_desc$set_dep("httr", type = desc::dep_types[1])
 
 # set staging setting
-my_desc$set("StagedInstall", "no")
+#my_desc$set("StagedInstall", "no")
 
 
 
