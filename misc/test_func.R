@@ -25,5 +25,5 @@ this_body <- jsonlite::toJSON(list(
 httr::POST(url = "http://127.0.0.1:9662/addJob",
            body = this_body)
 
-aa <- httr::GET(url = "http://127.0.0.1:9662/tasklist")
-data.table::rbindlist(httr::content(aa))
+#aa <- httr::GET(url = "http://127.0.0.1:9662/tasklist")
+#data.table::rbindlist(httr::content(aa))

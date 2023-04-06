@@ -1,8 +1,9 @@
-api_version <- "0.0.0.9004"
+api_version <- "0.0.0.9005"
 # this need to be in the first line, since it is updated automatically
 
 # loads the port from the global env, which was set within run_cardoon()
-api_path <- paste0("http://127.0.0.1:", Sys.getenv("CARDOON_PORT", "8000"))
+api_port <- Sys.getenv("CARDOON_PORT", "8000")
+api_path <- paste0("http://127.0.0.1:", api_port)
 
 # get number of worker
 num_worker <- as.integer(Sys.getenv("CARDOON_NUM_WORKER", "1"))
@@ -10,13 +11,18 @@ num_worker <- as.integer(Sys.getenv("CARDOON_NUM_WORKER", "1"))
 check_seconds <- as.integer(Sys.getenv("CARDOON_CHECK_SECONDS", "60"))
 sleep_time <- as.integer(Sys.getenv("CARDOON_SLEEP_TIME", "10"))
 
+logger::log_info("loaded env vars:\n",
+                 "API path         : ", api_path, "\n",
+                 "number of workers: ",num_worker, "\n",
+                 "checking seconds : ",check_seconds, "\n",
+                 "sleeping time    : ",sleep_time, "\n")
 
 # background process ------------------------------------------------------
 
 # TODO remove into helper script?
+logger::log_info("start background process")
 rbg_nextjob <- callr::r_bg(
   # TODO change logging file to parameter
-  stdout = "bg.txt",
   func = function(api_path, check_seconds = 60, sleep_time = 10) {
 
     print("initialise caRdoon background process")
@@ -62,111 +68,11 @@ rbg_nextjob <- callr::r_bg(
 
 # Task queue --------------------------------------------------------------
 
-
-task_q <- R6::R6Class(
-  "task_q",
-  public = list(
-    initialize = function(concurrency = num_worker) {
-      private$start_workers(concurrency)
-      invisible(self)
-    },
-    list_tasks = function() private$tasks,
-    get_num_waiting = function()
-      sum(!private$tasks$idle & private$tasks$state == "waiting"),
-    get_num_running = function()
-      sum(!private$tasks$idle & private$tasks$state == "running"),
-    get_num_done = function() sum(private$tasks$state == "done"),
-    is_idle = function() sum(!private$tasks$idle) == 0,
-
-    push = function(fun, args = list(), id = NULL) {
-      if (is.null(id)) id <- private$get_next_id()
-      if (id %in% private$tasks$id) stop("Duplicate task id")
-      before <- which(private$tasks$idle)[1]
-      private$tasks <- tibble::add_row(
-        private$tasks, .before = before,
-        id = id, idle = FALSE, state = "waiting", fun = list(fun),
-        args = list(args), worker = list(NULL), result = list(NULL))
-      private$schedule()
-      invisible(id)
-    },
-
-    poll = function(timeout = 0) {
-      limit <- Sys.time() + timeout
-      as_ms <- function(x) if (x == Inf) -1L else as.integer(x)
-      repeat{
-        topoll <- which(private$tasks$state == "running")
-        conns <- lapply(
-          private$tasks$worker[topoll],
-          function(x) x$get_poll_connection())
-        pr <- processx::poll(conns, as_ms(timeout))
-        private$tasks$state[topoll][pr == "ready"] <- "ready"
-        private$schedule()
-        ret <- private$tasks$id[private$tasks$state == "done"]
-        if (is.finite(timeout)) timeout <- limit - Sys.time()
-        if (length(ret) || timeout < 0) break;
-      }
-      ret
-    },
-
-    pop = function(timeout = 0) {
-      if (is.na(done <- self$poll(timeout)[1])) return(NULL)
-      row <- match(done, private$tasks$id)
-      result <- private$tasks$result[[row]]
-      private$tasks <- private$tasks[-row, ]
-      c(result, list(task_id = done))
-    }
-  ),
-
-  private = list(
-    tasks = NULL,
-    next_id = 1L,
-    get_next_id = function() {
-      id <- private$next_id
-      private$next_id <- id + 1L
-      paste0(".", id)
-    },
-
-    start_workers = function(concurrency) {
-      private$tasks <- tibble::tibble(
-        id = character(), idle = logical(),
-        state = c("waiting", "running", "ready", "done")[NULL],
-        fun = list(), args = list(), worker = list(), result = list())
-      for (i in seq_len(concurrency)) {
-        rs <- callr::r_session$new(wait = FALSE)
-        private$tasks <- tibble::add_row(
-          private$tasks,
-          id = paste0(".idle-", i), idle = TRUE, state = "running",
-          fun = list(NULL), args = list(NULL), worker = list(rs),
-          result = list(NULL))
-      }
-    },
-
-    schedule = function() {
-      ready <- which(private$tasks$state == "ready")
-      if (!length(ready)) return()
-      rss <- private$tasks$worker[ready]
-
-      private$tasks$result[ready] <- lapply(rss, function(x) x$read())
-      private$tasks$worker[ready] <- replicate(length(ready), NULL)
-      private$tasks$state[ready] <-
-        ifelse(private$tasks$idle[ready], "waiting", "done")
-
-      waiting <- which(private$tasks$state == "waiting")[1:length(ready)]
-      private$tasks$worker[waiting] <- rss
-      private$tasks$state[waiting] <-
-        ifelse(private$tasks$idle[waiting], "ready", "running")
-      lapply(waiting, function(i) {
-        if (! private$tasks$idle[i]) {
-          private$tasks$worker[[i]]$call(private$tasks$fun[[i]],
-                                         private$tasks$args[[i]])
-        }
-      })
-    }
-  )
-)
-
+logger::log_info("setup R6 object")
+task_q <- caRdoon:::create_task_object()
 q <- task_q$new()
 
+logger::log_info("caRdoon API ready")
 # endpoints ---------------------------------------------------------------
 
 
@@ -176,7 +82,6 @@ q <- task_q$new()
 function(){
   task_result <- q$pop(0)
 }
-
 
 
 #* Add a new job to the list
@@ -205,12 +110,14 @@ function(){
   return(tmp_list[c("id", "idle", "state")])
 }
 
+
 #* Return version
 #* @get /version
 function(){
   cat("Version:", api_version, "\n")
   return(api_version)
 }
+
 
 #* Returns true if running and available
 #* @get /ping
@@ -218,6 +125,7 @@ function(){
   return(TRUE)
 }
 
+
 #* Return version
 #* @get /version
 function(){
@@ -225,7 +133,6 @@ function(){
   return(api_version)
 }
 
-rbg_nextjob$read_all_output_lines()
 
 # update API documentation
 #* @plumber

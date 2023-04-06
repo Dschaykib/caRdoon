@@ -9,10 +9,8 @@
 #' @param sleep_time integer with the number of seconds the background process sleeps
 #' @param docs a boolean indicating if the docs should be started
 #'
-#' @import R6
 #' @import plumber
-#' @import callr
-#' @import httr
+#' @import logger
 #'
 #' @return a message, that the API has closed
 #' @export
@@ -29,7 +27,7 @@ run_cardoon <- function(
   # TODO check put this blog for plumber package structure
   # https://community.rstudio.com/t/plumber-api-and-package-structure/18099/11
 
-
+  logger::log_info("set env vars for caRdoon API")
   # set the API port and number of workers as a global env, so that the
   # underlying background process knows which port to use
   Sys.setenv(CARDOON_PORT = port)
@@ -39,9 +37,10 @@ run_cardoon <- function(
 
 # path_fkt <- file.path(system.file(package = "caRdoon"),
 #                       "R", "cardoon_api.R")
-  path_fkt <- "inst/plumber/cardoon_api.R"
-  print(path_fkt)
+  #path_fkt <- "inst/plumber/cardoon_api.R"
+  #print(path_fkt)
   # plumber::pr(path_fkt) %>%
+  logger::log_info("start caRdoon API")
   plumber::plumb_api(package = "caRdoon", name = "cardoon") %>%
     plumber::pr_run(
       # manually set port
@@ -51,7 +50,7 @@ run_cardoon <- function(
       # do not display start up messages
       quiet = TRUE
     )
-
+  logger::log_info("end caRdoon API")
   return("API closed")
 }
 

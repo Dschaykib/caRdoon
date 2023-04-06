@@ -91,6 +91,21 @@ my_news$add_version(my_desc$get_version())
 
 my_news$add_bullet(c("add env vars sleep_time and check_seconds"))
 
+# refactor and fixes ------------------------------------------------------
+
+my_desc$bump_version("dev")
+my_news$add_version(my_desc$get_version())
+
+my_desc$set_dep("logger", type = desc::dep_types[1])
+my_desc$set_dep("tibble", type = desc::dep_types[1])
+my_desc$set_dep("processx", type = desc::dep_types[1])
+
+my_news$add_bullet(c("refactor internal functions",
+                     "add logging",
+                     "fix tests"))
+
+
+
 # WIP ---------------------------------------------------------------------
 
 # bump dev version
