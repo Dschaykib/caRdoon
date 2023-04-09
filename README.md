@@ -74,13 +74,13 @@ This will return a table with the current jobs and their status.
 
 First a small working package is planed, but there are already ideas floating around for improvements and enhancements. For example:
 
-- [ ] adding a file/DB to store results
-- [ ] integrate testing
-- [ ] provide docker container
-- [ ] add priority for tasks
+- [x] integrate testing
 - [x] add logging within API
 - [ ] check error handling
 - [ ] remove dependencies
+- [ ] adding a file/DB to store results
+- [ ] provide docker container
+- [ ] add priority for tasks
 - [ ] ...
 
 
