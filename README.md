@@ -1,4 +1,4 @@
-# :leafy_green: caRdoon - 0.0.0.9005 <img src="misc/cardoon.png" width=170 align="right" />
+# :leafy_green: caRdoon - 0.0.0.9006 <img src="misc/cardoon.png" width=170 align="right" />
 
 A task queue API for R roughly based on functionality of [celery](https://github.com/celery/celery).
 
@@ -6,7 +6,7 @@ A task queue API for R roughly based on functionality of [celery](https://github
 
 Source: [Wikipedia](https://en.wikipedia.org/wiki/Cardoon)
 
-# Dislaimer
+# Disclaimer
 
 This is still work in progress and functionality, parameters and such might change.
 
@@ -37,6 +37,8 @@ The main endpoints are:
 #### /addJob
 
 This will add a new job to the task list. The added job is a function `func` which needs all parameter given via `args_list`. Since the process is spawned in a separate R process in the background, it does not have access to the global environment.
+
+At the moment, the results are not saved or stored. Therefore, the given function is responsible to save the output or logs.
 
 For example:
 
@@ -76,7 +78,7 @@ First a small working package is planed, but there are already ideas floating ar
 - [ ] integrate testing
 - [ ] provide docker container
 - [ ] add priority for tasks
-- [ ] add logging within API and output files
+- [x] add logging within API
 - [ ] check error handling
 - [ ] remove dependencies
 - [ ] ...

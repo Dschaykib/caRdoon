@@ -105,6 +105,15 @@ my_news$add_bullet(c("refactor internal functions",
                      "fix tests"))
 
 
+# refactor and fixes ------------------------------------------------------
+
+my_desc$bump_version("dev")
+my_news$add_version(my_desc$get_version())
+
+my_desc$set_dep("jsonlite", type = desc::dep_types[3], version = "*")
+
+my_news$add_bullet(c("update tests and logging",
+                     "fiy typos"))
 
 # WIP ---------------------------------------------------------------------
 

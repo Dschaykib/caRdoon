@@ -21,9 +21,8 @@ run_cardoon <- function(
     check_seconds = 60,
     sleep_time = 10,
     docs = FALSE) {
+
   # TODO add logging wihtin API on different levels (info, debug, ...)
-  # TODO add number of worker as parameter
-  # TODO add API path for background process
   # TODO check put this blog for plumber package structure
   # https://community.rstudio.com/t/plumber-api-and-package-structure/18099/11
 
@@ -35,11 +34,6 @@ run_cardoon <- function(
   Sys.setenv(CARDOON_CHECK_SECONDS = check_seconds)
   Sys.setenv(CARDOON_SLEEP_TIME = sleep_time)
 
-# path_fkt <- file.path(system.file(package = "caRdoon"),
-#                       "R", "cardoon_api.R")
-  #path_fkt <- "inst/plumber/cardoon_api.R"
-  #print(path_fkt)
-  # plumber::pr(path_fkt) %>%
   logger::log_info("start caRdoon API")
   plumber::plumb_api(package = "caRdoon", name = "cardoon") %>%
     plumber::pr_run(

@@ -1,4 +1,4 @@
-api_version <- "0.0.0.9005"
+api_version <- "0.0.0.9006"
 # this need to be in the first line, since it is updated automatically
 
 # loads the port from the global env, which was set within run_cardoon()
@@ -64,7 +64,8 @@ rbg_nextjob <- callr::r_bg(
   },
   args = list(api_path = api_path,
               check_seconds = check_seconds,
-              sleep_time = sleep_time))
+              sleep_time = sleep_time)
+  )
 
 # Task queue --------------------------------------------------------------
 
@@ -81,6 +82,15 @@ logger::log_info("caRdoon API ready")
 #* @get /nextJob
 function(){
   task_result <- q$pop(0)
+  if (!is.null(task_result)) {
+    logger::log_info(task_result$task_id,
+                     " done with status ",
+                     task_result$code)
+    if (!is.null(task_result$error)) {
+      logger::log_error(task_result$error)
+    }
+
+  }
 }
 
 
@@ -126,11 +136,18 @@ function(){
 }
 
 
-#* Return version
+#* Returns version
 #* @get /version
 function(){
   cat("Version:", api_version, "\n")
   return(api_version)
+}
+
+#* Returns status of background process
+#* @get /background
+function(){
+  print(rbg_nextjob)
+  return(rbg_nextjob$format())
 }
 
 

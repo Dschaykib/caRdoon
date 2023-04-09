@@ -1,3 +1,10 @@
+## version 0.0.0.9006
+
+---
+
+- update tests and logging
+- fiy typos
+
 ## version 0.0.0.9005
 
 ---

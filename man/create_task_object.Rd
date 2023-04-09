@@ -14,5 +14,5 @@ an R6 object to track and queue tasks
 }
 \description{
 The process and details for this R6 class can be found
-  [here](https://www.tidyverse.org/blog/2019/09/callr-task-q/).
+  (here)[https://www.tidyverse.org/blog/2019/09/callr-task-q/].
 }
