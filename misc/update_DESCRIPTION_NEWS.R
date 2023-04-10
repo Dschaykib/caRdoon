@@ -64,8 +64,7 @@ my_desc$set_dep("httr", type = desc::dep_types[1])
 my_desc$bump_version("dev")
 my_news$add_version(my_desc$get_version())
 
-my_news$add_bullet(c("add newsmd for easier creation",
-                     "add API code "))
+my_news$add_bullet(c("add API code "))
 
 
 # fix testing -------------------------------------------------------------
@@ -115,6 +114,13 @@ my_desc$set_dep("jsonlite", type = desc::dep_types[3], version = "*")
 my_news$add_bullet(c("update tests and logging",
                      "fiy typos"))
 
+
+# bump to minor version ---------------------------------------------------
+
+my_desc$bump_version("patch")
+my_news$add_version(my_desc$get_version())
+
+
 # WIP ---------------------------------------------------------------------
 
 # bump dev version
@@ -127,7 +133,7 @@ my_news$add_bullet(c("update tests and logging",
 
 my_desc$set("Date", Sys.Date())
 my_desc$write(file = "DESCRIPTION")
-my_news$write(file = "NEWS.md")
+my_news$write(file = "NEWS.md",reduce_dev = TRUE)
 
 # set API version
 cardoon_api_file <- readLines("inst/plumber/cardoon/plumber.R")
