@@ -81,6 +81,9 @@ First a small working package is planed, but there are already ideas floating ar
 - [ ] adding a file/DB to store results
 - [ ] provide docker container
 - [ ] add priority for tasks
+- [ ] add comments in code
+- [ ] update README with example output
+- [ ] check if global variables are needed or can be replaced by inputs
 - [ ] ...
 
 
