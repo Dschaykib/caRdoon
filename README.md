@@ -76,7 +76,7 @@ First a small working package is planed, but there are already ideas floating ar
 
 - [x] integrate testing
 - [x] add logging within API
-- [ ] check error handling
+- [ ] check error handling, erros wihtin the worker (memory, exceprions, ...)
 - [ ] remove dependencies
 - [ ] adding a file/DB to store results
 - [ ] provide docker container
