@@ -114,6 +114,10 @@ my_desc$set_dep("jsonlite", type = desc::dep_types[3], version = "*")
 my_news$add_bullet(c("update tests and logging",
                      "fix typos"))
 
+# bump to minor version ---------------------------------------------------
+
+my_desc$bump_version("patch")
+my_news$add_version(my_desc$get_version())
 
 
 # minor docu fixes --------------------------------------------------------
@@ -124,13 +128,6 @@ my_news$add_version(my_desc$get_version())
 my_news$add_bullet(c("update documentation",
                      "fix bug with number of workers",
                      "fix typos"))
-
-
-# bump to minor version ---------------------------------------------------
-
-my_desc$bump_version("patch")
-my_news$add_version(my_desc$get_version())
-
 
 
 
