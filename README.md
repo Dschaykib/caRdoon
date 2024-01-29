@@ -1,4 +1,4 @@
-# :leafy_green: caRdoon - 0.0.1 <img src="misc/cardoon.png" width=170 align="right" />
+# :leafy_green: caRdoon - 0.0.1.9000 <img src="misc/cardoon.png" width=170 align="right" />
 
 A task queue API for R roughly based on functionality of [celery](https://github.com/celery/celery).
 

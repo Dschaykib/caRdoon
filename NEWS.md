@@ -1,9 +1,17 @@
+## version 0.0.1.9000
+
+---
+
+- update documentation
+- fix bug with number of workers
+- fix typos
+
 ## version 0.0.1
 
 ---
 
 - update tests and logging
-- fiy typos
+- fix typos
 - refactor internal functions
 - add logging
 - fix tests

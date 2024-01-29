@@ -1,5 +1,6 @@
-api_version <- "0.0.1"
+api_version <- "0.0.1.9000"
 # this need to be in the first line, since it is updated automatically
+# via `misc/update_DESCRIPTION_NEWS.R`
 
 # loads the port from the global env, which was set within run_cardoon()
 api_port <- Sys.getenv("CARDOON_PORT", "8000")
@@ -13,6 +14,7 @@ sleep_time <- as.integer(Sys.getenv("CARDOON_SLEEP_TIME", "10"))
 
 logger::log_info("loaded env vars:\n",
                  "API path         : ", api_path, "\n",
+                 "docs path        : ", api_path, "/__docs__/\n",
                  "number of workers: ",num_worker, "\n",
                  "checking seconds : ",check_seconds, "\n",
                  "sleeping time    : ",sleep_time, "\n")
@@ -70,12 +72,13 @@ rbg_nextjob <- callr::r_bg(
 # Task queue --------------------------------------------------------------
 
 logger::log_info("setup R6 object")
-task_q <- caRdoon:::create_task_object()
+task_q <- caRdoon:::create_task_object(num_worker = num_worker)
 q <- task_q$new()
 
 logger::log_info("caRdoon API ready")
-# endpoints ---------------------------------------------------------------
 
+
+# endpoints ---------------------------------------------------------------
 
 #* Echo the parameter that was sent in
 #* param num:int number of task to be checked
@@ -95,7 +98,7 @@ function(){
 
 
 #* Add a new job to the list
-#* @param data:object
+#* @param data:object an object with func and args_list
 #* @post /addJob
 function(req) {
   # cat("addJob:", ids, "\n")
@@ -118,14 +121,6 @@ function(){
   tmp_list <- q$list_tasks()
   print(tmp_list)
   return(tmp_list[c("id", "idle", "state")])
-}
-
-
-#* Return version
-#* @get /version
-function(){
-  cat("Version:", api_version, "\n")
-  return(api_version)
 }
 
 
