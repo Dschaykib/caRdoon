@@ -12,14 +12,50 @@
 #' @import logger
 #' @import processx
 #' @import tibble
+#' @import DBI
+#' @import RSQLite
 #'
 #' @return an R6 object to track and queue tasks
 #'
 create_task_object <- function(num_worker = 1L) {
 
-  # add to avoids nots in package checks
+  # add to avoids notes in package checks
   private <- NA
   self <- NA
+
+
+  # setup database ----------------------------------------------------------
+
+  # TODO maybe add pool package
+  logger::log_info("Connect to 'caRdoon_task.sqlite'")
+  cardoon_db <- DBI::dbConnect(RSQLite::SQLite(), "caRdoon_task.sqlite")
+
+  # create empty db format for initialization
+  empty_db <- data.frame(
+    id = NA_integer_,
+    idle = NA,
+    state = NA_character_,
+    fun = NA_character_,
+    args = NA_character_,
+    worker = NA_character_,
+    result = NA_character_
+  )[0,]
+
+  db_list <- DBI::dbListTables(cardoon_db)
+  if ( length(db_list) == 0 ) {
+    logger::log_info("create inital DB file")
+    DBI::dbWriteTable(cardoon_db, "tasks", empty_db)
+  } else {
+    logger::log_info("DB 'tasks' found - load for intial queue")
+  }
+
+  task_db <- DBI::dbReadTable(cardoon_db, "tasks")
+
+  # rawToChar(serialize("", ascii = TRUE, connection = NULL))
+  # unserialize(charToRaw())
+
+# setup q-object ----------------------------------------------------------
+
 
   logger::log_info("create R6 object for tasks queue")
   task_q <- R6::R6Class(
@@ -28,6 +64,19 @@ create_task_object <- function(num_worker = 1L) {
       initialize = function(concurrency = num_worker) {
         private$start_workers(concurrency)
         invisible(self)
+
+        # add initital tasks
+        lapply(
+          X = seq_len(nrow(task_db)),
+          FUN = function(i_task, task_db) {
+            self$push(
+              fun = unserialize(charToRaw(task_db$fun[i_task])),
+              args = unserialize(charToRaw(task_db$args[i_task])),
+              id = task_db$id[i_task]
+              )
+            },
+          task_db = task_db
+        )
       },
       list_tasks = function() private$tasks,
       get_num_waiting = function()
@@ -44,7 +93,8 @@ create_task_object <- function(num_worker = 1L) {
         private$tasks <- tibble::add_row(
           private$tasks, .before = before,
           id = id, idle = FALSE, state = "waiting", fun = list(fun),
-          args = list(args), worker = list(NULL), result = list(NULL))
+          args = list(args), worker = list(NULL), result = list(NULL)
+          )
         private$schedule()
         invisible(id)
       },
@@ -78,7 +128,7 @@ create_task_object <- function(num_worker = 1L) {
 
     private = list(
       tasks = NULL,
-      next_id = 1L,
+      next_id = nrow(task_db) + 1L,
       get_next_id = function() {
         id <- private$next_id
         private$next_id <- id + 1L

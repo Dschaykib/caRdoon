@@ -129,6 +129,17 @@ my_news$add_bullet(c("update documentation",
                      "fix bug with number of workers",
                      "fix typos"))
 
+# add database for storage ------------------------------------------------
+
+my_desc$bump_version("minor")
+my_news$add_version(my_desc$get_version())
+
+my_news$add_bullet(c("add RSQLite database to store queue and results",
+                     "refactor background process"))
+
+my_desc$set_dep("DBI", type = desc::dep_types[1])
+my_desc$set_dep("RSQLite", type = desc::dep_types[1])
+
 
 
 # WIP ---------------------------------------------------------------------

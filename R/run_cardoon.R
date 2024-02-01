@@ -1,13 +1,15 @@
 #' Start up caRdoon API
 #'
-#' @description Running this function will create the caRdoon API.
-#' The API acts as a task queue with multiple workers in the background.
+#' @description Running this function will create the caRdoon API. The API acts
+#'   as a task queue with multiple workers in the background.
 #'
-#' @param port integer with the port, the API should run on
-#' @param num_worker integer with number of worker processes
-#' @param check_seconds integer with number of seconds before the background process checks if the API is still alive
-#' @param sleep_time integer with the number of seconds the background process sleeps
-#' @param docs a boolean indicating if the docs should be started
+#' @param port integer with the port, the API should run on.
+#' @param num_worker integer with number of worker processes.
+#' @param check_seconds integer with number of seconds before the background
+#'   process checks if the API is still alive.
+#' @param sleep_time integer with the number of seconds the background process
+#'   sleeps.
+#' @param docs a boolean indicating if the docs should be started.
 #'
 #' @import plumber
 #' @import logger
@@ -36,6 +38,14 @@ run_cardoon <- function(
 
   logger::log_info("start caRdoon API")
   plumber::plumb_api(package = "caRdoon", name = "cardoon") %>%
+    plumber::pr_hook(
+      stage = "exit",
+      # naming is done later in plumber.R
+      handler =  function() {
+        logger::log_info("closing DB ...")
+        #DBI::dbDisconnect(cardoon_db)
+        logger::log_info("closing DB done")
+        }) %>%
     plumber::pr_run(
       # manually set port
       port = port,

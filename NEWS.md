@@ -1,7 +1,9 @@
-## version 0.0.1.9000
+## version 0.1.0
 
 ---
 
+- add RSQLite database to store queue and results
+- refactor background process
 - update documentation
 - fix bug with number of workers
 - fix typos

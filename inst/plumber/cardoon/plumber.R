@@ -1,4 +1,4 @@
-api_version <- "0.0.1.9000"
+api_version <- "0.1.0"
 # this need to be in the first line, since it is updated automatically
 # via `misc/update_DESCRIPTION_NEWS.R`
 
@@ -19,51 +19,13 @@ logger::log_info("loaded env vars:\n",
                  "checking seconds : ",check_seconds, "\n",
                  "sleeping time    : ",sleep_time, "\n")
 
+
 # background process ------------------------------------------------------
 
-# TODO remove into helper script?
 logger::log_info("start background process")
 rbg_nextjob <- callr::r_bg(
   # TODO change logging file to parameter
-  func = function(api_path, check_seconds = 60, sleep_time = 10) {
-
-    print("initialise caRdoon background process")
-    # setup time to initialize API
-    Sys.sleep(2)
-    # setup to check if API is still running
-    check_api <- function() {
-      tryCatch({
-        httr::GET(paste0(api_path, "/ping"))
-      },
-      error = function(e) FALSE)
-    }
-    is_alive <- TRUE
-    start_time <- Sys.time()
-    # seconds between is_alive checks
-    # check_seconds <- 60
-    # seconds between API calls
-    # sleep_time <- 10
-
-
-    # loop for constant checks, to keep process updating
-    print("start caRdoon background process loop")
-    while(is_alive) {
-      Sys.sleep(sleep_time)
-      check <- tryCatch({httr::GET(paste0(api_path, "/nextJob"))},
-                        error = function(e){})
-
-      # update is_alive every x seconds
-      time_diff <- floor(as.numeric(difftime(
-        Sys.time(), start_time, units = "secs")
-      ))
-      if (time_diff %% check_seconds == 0) {
-        is_alive <- check_api()
-        print(paste0("check if API is alive:", is_alive))
-      }
-
-    }
-    print("end caRdoon background process loop")
-  },
+  func = caRdoon:::create_background_process,
   args = list(api_path = api_path,
               check_seconds = check_seconds,
               sleep_time = sleep_time)

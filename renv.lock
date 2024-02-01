@@ -9,6 +9,17 @@
     ]
   },
   "Packages": {
+    "DBI": {
+      "Package": "DBI",
+      "Version": "1.2.1",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Requirements": [
+        "R",
+        "methods"
+      ],
+      "Hash": "9b4993e98e0e19da84c168460c032fef"
+    },
     "R6": {
       "Package": "R6",
       "Version": "2.5.1",
@@ -18,6 +29,25 @@
         "R"
       ],
       "Hash": "470851b6d5d0ac559e9d01bb352b4021"
+    },
+    "RSQLite": {
+      "Package": "RSQLite",
+      "Version": "2.3.5",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Requirements": [
+        "DBI",
+        "R",
+        "bit64",
+        "blob",
+        "cpp11",
+        "memoise",
+        "methods",
+        "pkgconfig",
+        "plogr",
+        "rlang"
+      ],
+      "Hash": "f5a75d57e0a3014a6ef537ac04a80fc6"
     },
     "Rcpp": {
       "Package": "Rcpp",
@@ -39,6 +69,42 @@
         "sys"
       ],
       "Hash": "e8a22846fff485f0be3770c2da758713"
+    },
+    "bit": {
+      "Package": "bit",
+      "Version": "4.0.5",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Requirements": [
+        "R"
+      ],
+      "Hash": "d242abec29412ce988848d0294b208fd"
+    },
+    "bit64": {
+      "Package": "bit64",
+      "Version": "4.0.5",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Requirements": [
+        "R",
+        "bit",
+        "methods",
+        "stats",
+        "utils"
+      ],
+      "Hash": "9fe98599ca456d6552421db0d6772d8f"
+    },
+    "blob": {
+      "Package": "blob",
+      "Version": "1.2.4",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Requirements": [
+        "methods",
+        "rlang",
+        "vctrs"
+      ],
+      "Hash": "40415719b5a479b87949f3aa0aee737c"
     },
     "brew": {
       "Package": "brew",
@@ -68,6 +134,17 @@
         "tibble"
       ],
       "Hash": "2c5784964152481ba108e0e81ee9b52f"
+    },
+    "cachem": {
+      "Package": "cachem",
+      "Version": "1.0.7",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Requirements": [
+        "fastmap",
+        "rlang"
+      ],
+      "Hash": "cda74447c42f529de601fe4d4050daef"
     },
     "callr": {
       "Package": "callr",
@@ -237,6 +314,13 @@
         "utils"
       ],
       "Hash": "1d9e7ad3c8312a192dea7d3db0274fde"
+    },
+    "fastmap": {
+      "Package": "fastmap",
+      "Version": "1.1.1",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Hash": "f7736a18de97dea803bde0a2daaafb27"
     },
     "fs": {
       "Package": "fs",
@@ -438,6 +522,17 @@
       ],
       "Hash": "7ce2733a9826b3aeb1775d56fd305472"
     },
+    "memoise": {
+      "Package": "memoise",
+      "Version": "2.0.1",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Requirements": [
+        "cachem",
+        "rlang"
+      ],
+      "Hash": "e2817ccf4a065c5d9d7f2cfbe7c1d78c"
+    },
     "mime": {
       "Package": "mime",
       "Version": "0.12",
@@ -454,8 +549,8 @@
       "Source": "GitHub",
       "RemoteType": "github",
       "RemoteHost": "api.github.com",
-      "RemoteRepo": "newsmd",
       "RemoteUsername": "Dschaykib",
+      "RemoteRepo": "newsmd",
       "RemoteRef": "dev",
       "RemoteSha": "1de8879acb8a7ac7d0e15e7d4b0ef99ac09534de",
       "Requirements": [
@@ -534,6 +629,13 @@
         "withr"
       ],
       "Hash": "6b0c222c5071efe0f3baf3dae9aa40e2"
+    },
+    "plogr": {
+      "Package": "plogr",
+      "Version": "0.2.0",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Hash": "09eb987710984fc2905c7129c7d85e65"
     },
     "plumber": {
       "Package": "plumber",
