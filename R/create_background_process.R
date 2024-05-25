@@ -1,7 +1,7 @@
 #' Function to periodically call the API's endpoint to keep the queue moving
 #'
 #' @details When the API is not alive anymore, this process is terminated after
-#' a number of retries.
+#'   a number of retries.
 #'
 #'
 #' @param api_path string with the path to the API.
@@ -16,11 +16,12 @@
 #'
 #' @return no actual return value
 create_background_process <- function(
-    api_path,
-    check_seconds = 60,
-    sleep_time = 10,
-    retry = 5
+  api_path,
+  check_seconds = 60,
+  sleep_time = 10,
+  retry = 5
 ) {
+
 
   logger::log_info("initialise caRdoon background process")
   # setup time to initialize API
@@ -29,7 +30,9 @@ create_background_process <- function(
   # setup to check if API is still running
   check_api <- function() {
     tryCatch({
-      httr::GET(paste0(api_path, "/ping"))
+      tmp_call <- httr::GET(paste0(api_path, "/ping"))
+      # return value of ping (should be TRUE)
+      httr::content(tmp_call)[[1]]
     },
     error = function(e) FALSE)
   }
@@ -37,30 +40,32 @@ create_background_process <- function(
   check_time <- Sys.time()
   current_try <- 1
 
-  # seconds between is_alive checks
-  # check_seconds <- 60
-  # seconds between API calls
-  # sleep_time <- 10
-
-
   # loop for constant checks, to keep process updating
+  logger::log_info("listening to: ", api_path)
   logger::log_info("start caRdoon background process loop")
-  while(current_try > retry) {
+  last_msg <- ""
+  this_msg <- ""
+  while (current_try <= retry) {
     Sys.sleep(sleep_time)
     check <- tryCatch({
       httr::GET(paste0(api_path, "/nextJob"))
     },
-    error = function(e){})
+    error = function(e) e)
+
+    if (length(check$message) > 0 ) {
+      this_msg <- check$message
+    }
+    if (last_msg != this_msg) {
+      logger::log_info("last msg: ", this_msg)
+      last_msg <- this_msg
+    }
 
     # update is_alive every x seconds
-    time_diff <- floor(as.numeric(difftime(
-      Sys.time(), check_time, units = "secs")
-    ))
-    if (Sys.time() > (check_time + check_seconds) ) {
+    if (Sys.time() > (check_time + check_seconds)) {
       check_time <- Sys.time()
       is_alive <- check_api()
       logger::log_info(paste0(current_try, " / ", retry,
-                              " check if API is alive:", is_alive))
+                              " check if API is alive: ", is_alive))
       if (is_alive) {
         current_try <- 1
       } else {

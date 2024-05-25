@@ -6,7 +6,7 @@ unlink("NEWS.md")
 
 # update renv packages if needed
 renv::clean()
-renv::snapshot(prompt = TRUE)
+renv::snapshot(prompt = TRUE, exclude = "caRdoon")
 
 
 # initial files -----------------------------------------------------------
@@ -141,6 +141,25 @@ my_desc$set_dep("DBI", type = desc::dep_types[1])
 my_desc$set_dep("RSQLite", type = desc::dep_types[1])
 
 
+# fix DB setup --------------------------------------------------------
+
+my_desc$bump_version("dev")
+my_news$add_version(my_desc$get_version())
+my_desc$set_dep("lintr", type = desc::dep_types[3])
+my_desc$set_dep("withr", type = desc::dep_types[3])
+
+my_news$add_bullet(c("refactor DB setup and tests",
+                     "add lintr and withr"))
+
+# fix DB setup --------------------------------------------------------
+
+my_desc$bump_version("dev")
+my_news$add_version(my_desc$get_version())
+my_news$add_bullet(c("adjust logging"))
+
+my_desc$bump_version("dev")
+my_news$add_version(my_desc$get_version())
+my_news$add_bullet(c("fix id type to numeric"))
 
 # WIP ---------------------------------------------------------------------
 
@@ -179,11 +198,20 @@ my_readme[1] <- paste0(
 writeLines(my_readme, "README.md")
 
 
+# pkg builds and checks ---------------------------------------------------
+
 # set pkg names
 origin::originize_pkg()
+
+# check lints
+lintr::lint_package()
 
 # update documentation
 roxygen2::roxygenise()
 # tidy DESCRIPTON
 usethis::use_tidy_description()
 
+# TODO clean and install package!
+
+# check package structure
+devtools::check(document = FALSE)

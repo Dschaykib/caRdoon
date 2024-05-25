@@ -1,3 +1,22 @@
+## version 0.1.0.9002
+
+---
+
+- fix id type to numeric
+
+## version 0.1.0.9001
+
+---
+
+- adjust logging
+
+## version 0.1.0.9000
+
+---
+
+- refactor DB setup and tests
+- add lintr and withr
+
 ## version 0.1.0
 
 ---

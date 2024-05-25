@@ -31,5 +31,5 @@ Function to periodically call the API's endpoint to keep the queue moving
 }
 \details{
 When the API is not alive anymore, this process is terminated after
-a number of retries.
+  a number of retries.
 }

@@ -7,9 +7,10 @@
 run_cardoon(
   port = 9662,
   num_worker = 1,
-  check_seconds = 60,
-  sleep_time = 10,
-  docs = FALSE
+  check_seconds = 10,
+  sleep_time = 5,
+  docs = FALSE,
+  log_path = "logs/"
 )
 }
 \arguments{
@@ -24,6 +25,9 @@ process checks if the API is still alive.}
 sleeps.}
 
 \item{docs}{a boolean indicating if the docs should be started.}
+
+\item{log_path}{a path to a file where the logs of the backend
+process are stored}
 }
 \value{
 a message, that the API has closed
