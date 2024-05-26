@@ -1,4 +1,4 @@
-# :leafy_green: caRdoon - 0.1.0.9002 <img src="misc/cardoon.png" width=170 align="right" />
+# :leafy_green: caRdoon - 0.1.0.9003 <img src="misc/cardoon.png" width=170 align="right" />
 
 A task queue API for R roughly based on functionality of [celery](https://github.com/celery/celery).
 
@@ -76,16 +76,16 @@ First a small working package is planed, but there are already ideas floating ar
 
 - [x] integrate testing
 - [x] add logging within API
-- [ ] refactor so that used function is given at startup time not during run time per API call
 - [ ] check error handling, errors within the worker (memory, exceptions, ...)
 - [ ] remove dependencies
-- [ ] adding a file/DB to store results
+- [x] adding a file/DB to store results
 - [ ] provide docker container
 - [ ] add priority for tasks
 - [ ] add comments in code
 - [ ] update README with example output
 - [ ] check if global variables are needed or can be replaced by inputs
 - [ ] add status to API enpoints
+- [ ] refactor so that used function is given at startup time not during run time per API call
 - [ ] ...
 
 

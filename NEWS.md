@@ -1,3 +1,10 @@
+## version 0.1.0.9003
+
+---
+
+- add DB updates for status
+- update .lintr options
+
 ## version 0.1.0.9002
 
 ---

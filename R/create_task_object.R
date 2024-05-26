@@ -90,7 +90,6 @@ create_task_object <- function(num_worker = 1L, db_init = FALSE) {
         # add row to DB and use empty_db function to create a new row
         new_row <- create_row(id = id, fun = fun, args = args)
         new_db_row <- create_db_row(new_row)
-        browser()
         if (add_db) {
           logger::log_info("-- debug: add row to db in push")
           DBI::dbAppendTable(cardoon_db, "tasks", new_db_row)
@@ -100,7 +99,7 @@ create_task_object <- function(num_worker = 1L, db_init = FALSE) {
           private$tasks,
           .before = before,
           new_row
-          )
+        )
 
         # TODO needs ordering and fixing?
         # private$tasks <- rbind(private$tasks, new_row)
@@ -123,23 +122,16 @@ create_task_object <- function(num_worker = 1L, db_init = FALSE) {
             function(x) x$get_poll_connection())
           pr <- processx::poll(conns, as_ms(timeout))
 
+
           private$tasks$state[topoll][pr == "ready"] <- "ready"
 
+          # TODO maybe add check for status "timeout" too
 
           private$schedule()
           ret <- private$tasks$id[private$tasks$state == "done"]
           if (is.finite(timeout)) timeout <- limit - Sys.time()
           if (length(ret) || timeout < 0) break
         }
-
-        # TODO update DB with new status
-        logger::log_info("poll: overwrite DB tasks-table")
-        DBI::dbWriteTable(
-          conn = cardoon_db,
-          name = "tasks",
-          value = private$tasks,
-          overwrite = TRUE)
-
         return(ret)
       },
 
@@ -150,12 +142,14 @@ create_task_object <- function(num_worker = 1L, db_init = FALSE) {
         result <- private$tasks$result[[row]]
         private$tasks <- private$tasks[-row, ]
 
-        logger::log_info("pop: overwrite DB tasks-table")
-        DBI::dbWriteTable(
-          conn = cardoon_db,
-          name = "tasks",
-          value = private$tasks,
-          overwrite = TRUE)
+        # TODO update instead of overwrite because results need to be kept
+
+        # logger::log_info("pop: overwrite DB tasks-table")
+        # DBI::dbWriteTable(
+        #   conn = cardoon_db,
+        #   name = "tasks",
+        #   value = private$tasks,
+        #   overwrite = TRUE)
 
         out <- c(result, list(task_id = done))
         return(out)
@@ -216,18 +210,48 @@ create_task_object <- function(num_worker = 1L, db_init = FALSE) {
         private$tasks$state[ready] <-
           ifelse(private$tasks$idle[ready], "waiting", "done")
 
-        waiting <- which(private$tasks$state == "waiting")[1:length(ready)]
+        waiting <- which(private$tasks$state == "waiting")[seq_along(ready)]
         private$tasks$worker[waiting] <- rss
         private$tasks$state[waiting] <-
           ifelse(private$tasks$idle[waiting], "ready", "running")
 
-        logger::log_info("schedule: overwrite DB tasks-table")
-        DBI::dbWriteTable(
-          conn = cardoon_db,
-          name = "tasks",
-          value = private$tasks,
-          overwrite = TRUE)
-        logger::log_info("schedule: overwriting done")
+        # DONE add update SQL function
+        # - result
+        # - state
+        # - worker (not needed)
+        updates <- unique(c(ready, waiting))
+        if (all.equal(sort(ready), sort(waiting))) {
+          # case when only idle jobs are left
+          # 'ready' and 'waiting' are then the same
+          updates <- c()
+        }
+        logger::log_info(
+          "schedule: update ", length(updates), " row in DB task-table"
+        )
+
+        for (i_update in updates) {
+          this_set <- list(
+            state = private$tasks$state[i_update],
+            result = rawToChar(
+              serialize(
+                object = private$tasks$result[i_update],
+                ascii = TRUE,
+                connection = NULL
+              )
+            )
+
+          )
+          this_update <- db_update_row(
+            con = cardoon_db,
+            tablename = "tasks",
+            key = list(id = private$tasks$id[i_update]),
+            set = this_set
+          )
+          logger::log_info(
+            "update id ", private$tasks$id[i_update], ": ", this_update
+          )
+
+        }
 
         lapply(waiting, function(i) {
           if (!private$tasks$idle[i]) {

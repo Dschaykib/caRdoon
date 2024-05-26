@@ -52,7 +52,7 @@ create_background_process <- function(
     },
     error = function(e) e)
 
-    if (length(check$message) > 0 ) {
+    if (length(check$message) > 0) {
       this_msg <- check$message
     }
     if (last_msg != this_msg) {

@@ -1,4 +1,4 @@
-api_version <- "0.1.0.9002"
+api_version <- "0.1.0.9003"
 # this need to be in the first line, since it is updated automatically
 # via `misc/update_DESCRIPTION_NEWS.R`
 

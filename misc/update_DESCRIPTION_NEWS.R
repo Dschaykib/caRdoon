@@ -4,11 +4,6 @@
 unlink("DESCRIPTION")
 unlink("NEWS.md")
 
-# update renv packages if needed
-renv::clean()
-renv::snapshot(prompt = TRUE, exclude = "caRdoon")
-
-
 # initial files -----------------------------------------------------------
 
 # Create a new description object
@@ -161,6 +156,11 @@ my_desc$bump_version("dev")
 my_news$add_version(my_desc$get_version())
 my_news$add_bullet(c("fix id type to numeric"))
 
+my_desc$bump_version("dev")
+my_news$add_version(my_desc$get_version())
+my_news$add_bullet(c("add DB updates for status",
+                     "update .lintr options"))
+
 # WIP ---------------------------------------------------------------------
 
 # bump dev version
@@ -200,6 +200,10 @@ writeLines(my_readme, "README.md")
 
 # pkg builds and checks ---------------------------------------------------
 
+# update renv packages if needed
+renv::clean()
+renv::snapshot(prompt = TRUE, exclude = "caRdoon")
+
 # set pkg names
 origin::originize_pkg()
 
@@ -211,7 +215,11 @@ roxygen2::roxygenise()
 # tidy DESCRIPTON
 usethis::use_tidy_description()
 
-# TODO clean and install package!
+# clean and install package!
+utils::menu(
+  choices = c("Yes", "No"),
+  title = "Did you press 'clean and install' yet?"
+)
 
 # check package structure
 devtools::check(document = FALSE)
