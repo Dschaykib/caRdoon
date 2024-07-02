@@ -73,6 +73,8 @@ testthat::test_that("enpoint tasklist has correct format", {
   testthat::expect_named(call[[1]], c("id", "idle", "state"))
 
 })
+
+
 testthat::test_that("enpoint nextJob has correct format", {
 
 
@@ -87,6 +89,7 @@ testthat::test_that("enpoint nextJob has correct format", {
 
   # /addJob has no return value
 })
+
 
 testthat::test_that("example function works", {
 
@@ -132,5 +135,50 @@ testthat::test_that("example function works", {
   # the default number of workers is 1, therefore +1 idle job
   testthat::expect_equal(nrow(call_dt), test_runs + 1)
 
+
+})
+
+
+testthat::test_that("enpoint getResult is an empty list for idle tasks", {
+
+  # /getResult
+  link <- "http://localhost:8000/getResult"
+  # idle task have negative ids
+  this_body <- jsonlite::toJSON(list("id" = -1L))
+
+  api_content <- tryCatch(
+    expr = {
+      api_call <- httr::POST(url = link, body = this_body)
+      httr::content(api_call, encoding = "UTF-8")
+    },
+    error = function(x) NA
+  )
+
+  # returns list() because idle task is never done
+  print(api_content)
+  testthat::expect_type(api_content, "list")
+  testthat::expect_length(api_content, 0)
+
+})
+
+
+testthat::test_that("enpoint getResult is working", {
+
+  # /getResult
+  link <- "http://localhost:8000/getResult"
+  # idle task have negative ids
+  this_body <- jsonlite::toJSON(list("id" = -1L))
+
+  api_content <- tryCatch(
+    expr = {
+      api_call <- httr::POST(url = link, body = this_body)
+      httr::content(api_call, encoding = "UTF-8")
+    },
+    error = function(x) NA
+  )
+
+  # returns list() because idle task is never done
+  testthat::expect_type(api_content, "list")
+  testthat::expect_length(api_content, 0)
 
 })

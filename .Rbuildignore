@@ -4,3 +4,5 @@
 ^\.Rproj\.user$
 ^.*.sqlite
 ^misc
+^.lintr
+^temp_log/

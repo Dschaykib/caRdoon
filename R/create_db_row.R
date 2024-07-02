@@ -1,6 +1,4 @@
 create_db_row <- function(data) {
-
-  # data <- new_row
   # data has only 1 row
   # "list" columns are transformed
 

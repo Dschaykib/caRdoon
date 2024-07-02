@@ -31,7 +31,8 @@ create_task_object <- function(num_worker = 1L, db_init = FALSE) {
   # TODO maybe add pool package
   logger::log_info("Connect to 'caRdoon_task.sqlite'")
   cardoon_db <- DBI::dbConnect(RSQLite::SQLite(), "caRdoon_task.sqlite")
-  #cardoon_db <- DBI::dbConnect(RSQLite::SQLite(), "inst/plumber/cardoon/caRdoon_task.sqlite")
+  #cardoon_db <- DBI::dbConnect(RSQLite::SQLite(),
+  # "inst/plumber/cardoon/caRdoon_task.sqlite")
 
   # # create empty db format for initialization
   # empty_db <- data.frame(
@@ -140,9 +141,9 @@ create_task_object <- function(num_worker = 1L, db_init = FALSE) {
         if (is.na(done)) return(NULL)
         row <- match(done, private$tasks$id)
         result <- private$tasks$result[[row]]
-        private$tasks <- private$tasks[-row, ]
-
         # TODO update instead of overwrite because results need to be kept
+        # private$tasks <- private$tasks[-row, ]
+
 
         # logger::log_info("pop: overwrite DB tasks-table")
         # DBI::dbWriteTable(
@@ -170,7 +171,6 @@ create_task_object <- function(num_worker = 1L, db_init = FALSE) {
         logger::log_info("initialize tasks from DB with ",
                          nrow(task_db), " tasks")
         private$tasks <- create_row(state = character(0))
-
         # add initial tasks from DB
         added_rows <- lapply(
           X = seq_len(nrow(task_db)),
@@ -220,9 +220,12 @@ create_task_object <- function(num_worker = 1L, db_init = FALSE) {
         # - state
         # - worker (not needed)
         updates <- unique(c(ready, waiting))
-        if (all.equal(sort(ready), sort(waiting))) {
-          # case when only idle jobs are left
-          # 'ready' and 'waiting' are then the same
+
+        # case when only idle jobs are left
+        # 'ready' and 'waiting' are then the same
+        if ((length(ready) == length(waiting)) &
+            (all(ready %in% waiting) & all(waiting %in% ready))) {
+
           updates <- c()
         }
         logger::log_info(

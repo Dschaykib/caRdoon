@@ -1,4 +1,4 @@
-api_version <- "0.1.0.9003"
+api_version <- "0.1.0.9004"
 # this need to be in the first line, since it is updated automatically
 # via `misc/update_DESCRIPTION_NEWS.R`
 
@@ -29,7 +29,7 @@ logger::log_info("loaded env vars:\n",
 logger::log_info("setup R6 object")
 task_q <- caRdoon:::create_task_object(
   num_worker = num_worker,
-  db_init = TRUE)
+  db_init = FALSE)
 q <- task_q$new()
 
 
@@ -125,6 +125,53 @@ function() {
   tmp_list <- q$list_tasks()
   print(tmp_list)
   return(tmp_list[c("id", "idle", "state")])
+}
+
+
+#* Add a new job to the list
+#* @param id:numeric a numeric ID of a task
+#* @post /getResult
+function(req, res) {
+
+  this_id <- as.integer(req$args$id)
+
+  tmp_list <- q$list_tasks()
+  all_ids <- tmp_list$id
+  out <- NULL
+
+  # TODO add check in DB for result too
+  if (!this_id %in% all_ids) {
+    msg <- paste0("no task found with this id: '", this_id, "'")
+    logger::log_info(msg)
+    res$status <- 404 # Not found
+    out <- list(error = msg)
+  }
+
+
+  if (this_id %in% all_ids) {
+
+    # only finished task can be returned
+    this_row <- match(this_id, all_ids)
+    this_state <- tmp_list$state[this_row]
+    is_idle <- tmp_list$idle[this_row]
+
+    if (this_state %in% c("done")) {
+      # browser()
+      out <- tmp_list$result[this_row][[1]]$result
+    }
+
+    # only non-idle task can have a result
+    # idle task return NULL
+    if (!is_idle & !(this_state %in% c("done"))) {
+      msg <- paste0("job with id ", this_id, " (", this_state, ")",
+                    " is not 'done' yet")
+      logger::log_info(msg)
+      res$status <- 404 # Not found
+      out <- list(error = msg)
+    }
+  }
+
+  return(out)
 }
 
 

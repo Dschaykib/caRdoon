@@ -15,6 +15,7 @@
 #'
 #' @import plumber
 #' @import logger
+#' @importFrom utils packageVersion
 #'
 #' @return a message, that the API has closed
 #' @export
@@ -28,7 +29,7 @@ run_cardoon <- function(
   log_path = "logs/"
   ) {
 
-  logger::log_info("caRdoon version ", as.character(packageVersion("caRdoon")), "\n")
+  logger::log_info("caRdoon version ", as.character(packageVersion("caRdoon")))
 
   # TODO add logging within API on different levels (info, debug, ...)
   # TODO add timestamp to logfile per default

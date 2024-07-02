@@ -1,3 +1,9 @@
+## version 0.1.0.9004
+
+---
+
+- fix adding of jobs
+
 ## version 0.1.0.9003
 
 ---

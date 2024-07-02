@@ -161,6 +161,15 @@ my_news$add_version(my_desc$get_version())
 my_news$add_bullet(c("add DB updates for status",
                      "update .lintr options"))
 
+
+my_desc$bump_version("dev")
+my_news$add_version(my_desc$get_version())
+my_news$add_bullet(c("fix adding of jobs",
+                     "adding utils package as dependency"))
+my_desc$set_dep("utils", type = desc::dep_types[1])
+
+
+
 # WIP ---------------------------------------------------------------------
 
 # bump dev version
