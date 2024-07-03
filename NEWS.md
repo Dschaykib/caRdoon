@@ -1,8 +1,16 @@
+## version 0.1.0.9005
+
+---
+
+- fix saving of resutls into DB setup
+- adjust DB setup with name and init
+
 ## version 0.1.0.9004
 
 ---
 
 - fix adding of jobs
+- adding utils package as dependency
 
 ## version 0.1.0.9003
 

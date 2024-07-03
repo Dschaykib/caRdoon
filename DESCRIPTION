@@ -1,7 +1,7 @@
 Package: caRdoon
 Title: A task queue API for R
-Version: 0.1.0.9004
-Date: 2024-07-02
+Version: 0.1.0.9005
+Date: 2024-07-03
 Authors@R: 
     person("Jakob", "Gepp", , "jakob.gepp@yahoo.de", role = c("cre", "aut"))
 Description: Contains an API to create a task queue overview.
@@ -17,7 +17,8 @@ Imports:
     processx,
     R6,
     RSQLite,
-    tibble
+    tibble,
+    utils
 Suggests: 
     jsonlite,
     lintr,

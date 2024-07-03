@@ -1,4 +1,4 @@
-api_version <- "0.1.0.9004"
+api_version <- "0.1.0.9005"
 # this need to be in the first line, since it is updated automatically
 # via `misc/update_DESCRIPTION_NEWS.R`
 
@@ -14,6 +14,8 @@ num_worker <- as.integer(Sys.getenv("CARDOON_NUM_WORKER", "1"))
 check_seconds <- as.integer(Sys.getenv("CARDOON_CHECK_SECONDS", "60"))
 sleep_time <- as.integer(Sys.getenv("CARDOON_SLEEP_TIME", "10"))
 log_path <- Sys.getenv("CARDOON_LOG_PATH", "logs/")
+db_name <- Sys.getenv("CARDOON_DB_NAME", "caRdoon_task.sqlite")
+db_init <- as.logical(Sys.getenv("CARDOON_DB_INIT", "FALSE"))
 
 logger::log_info("loaded env vars:\n",
                  "API path         : ", api_path, "\n",
@@ -29,13 +31,14 @@ logger::log_info("loaded env vars:\n",
 logger::log_info("setup R6 object")
 task_q <- caRdoon:::create_task_object(
   num_worker = num_worker,
-  db_init = FALSE)
+  db_init = db_init,
+  db_name = db_name)
 q <- task_q$new()
 
 
 # background process ------------------------------------------------------
 
-bg_log_file <- paste0("bg_log_", format(Sys.time(), "%Y%M%d_%H%M%S"), ".txt")
+bg_log_file <- paste0("bg_log_", format(Sys.time(), "%Y%m%d_%H%M%S"), ".txt")
 bg_log_path <- file.path(log_path, bg_log_file)
 if (!dir.exists(dirname(bg_log_path))) {
   logger::log_info("create logging folder: '", dirname(bg_log_path), "'")
@@ -132,7 +135,6 @@ function() {
 #* @param id:numeric a numeric ID of a task
 #* @post /getResult
 function(req, res) {
-
   this_id <- as.integer(req$args$id)
 
   tmp_list <- q$list_tasks()
@@ -156,13 +158,13 @@ function(req, res) {
     is_idle <- tmp_list$idle[this_row]
 
     if (this_state %in% c("done")) {
-      # browser()
+      #browser()
       out <- tmp_list$result[this_row][[1]]$result
     }
 
     # only non-idle task can have a result
     # idle task return NULL
-    if (!is_idle & !(this_state %in% c("done"))) {
+    if (!is_idle && !(this_state %in% c("done"))) {
       msg <- paste0("job with id ", this_id, " (", this_state, ")",
                     " is not 'done' yet")
       logger::log_info(msg)

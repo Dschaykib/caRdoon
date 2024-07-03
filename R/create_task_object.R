@@ -5,8 +5,10 @@
 #'   (here)[https://www.tidyverse.org/blog/2019/09/callr-task-q/].
 #'
 #' @param num_worker integer, the number of worker processes
-#' @param db_init a boolean, if TRUE the task data base is overwritten
-#' and newly initialized.
+#' @param db_name a string with the name of the DB file. Should have the suffix
+#'   '.sqlite'
+#' @param db_init a boolean, if TRUE the task data base is overwritten and newly
+#'   initialized.
 #'
 #' @import R6
 #' @import callr
@@ -19,7 +21,10 @@
 #'
 #' @return an R6 object to track and queue tasks
 #'
-create_task_object <- function(num_worker = 1L, db_init = FALSE) {
+create_task_object <- function(
+    num_worker = 1L,
+    db_init = FALSE,
+    db_name = "caRdoon_task.sqlite") {
 
   # add to avoids notes in package checks
   private <- NA
@@ -29,10 +34,9 @@ create_task_object <- function(num_worker = 1L, db_init = FALSE) {
   # setup database ----------------------------------------------------------
 
   # TODO maybe add pool package
-  logger::log_info("Connect to 'caRdoon_task.sqlite'")
-  cardoon_db <- DBI::dbConnect(RSQLite::SQLite(), "caRdoon_task.sqlite")
-  #cardoon_db <- DBI::dbConnect(RSQLite::SQLite(),
-  # "inst/plumber/cardoon/caRdoon_task.sqlite")
+  logger::log_info("Connect to '", db_name, "'")
+  cardoon_db <- DBI::dbConnect(RSQLite::SQLite(), db_name)
+  #cardoon_db <- DBI::dbConnect(RSQLite::SQLite(),"inst/plumber/cardoon/caRdoon_task.sqlite")
 
   # # create empty db format for initialization
   # empty_db <- data.frame(
@@ -83,15 +87,28 @@ create_task_object <- function(num_worker = 1L, db_init = FALSE) {
       get_num_done = function() sum(private$tasks$state == "done"),
       is_idle = function() sum(!private$tasks$idle) == 0,
 
-      push = function(fun, args = list(), id = NULL, add_db = TRUE) {
+      push = function(fun,
+                      args = list(),
+                      result = NULL,
+                      id = NULL,
+                      add_db = TRUE,
+                      state = "waiting") {
         if (is.null(id)) id <- private$get_next_id()
         if (id %in% private$tasks$id) stop("Duplicate task id")
         before <- which(private$tasks$idle)[1]
+        # case when tasks are empty, but db initial tasks are loaded
+        # set before to default NULL
+        if (is.na(before)) before <- NULL
 
         # add row to DB and use empty_db function to create a new row
-        new_row <- create_row(id = id, fun = fun, args = args)
-        new_db_row <- create_db_row(new_row)
+        new_row <- create_row(
+          id = id,
+          fun = fun,
+          args = args,
+          result = result,
+          state = state)
         if (add_db) {
+          new_db_row <- create_db_row(new_row)
           logger::log_info("-- debug: add row to db in push")
           DBI::dbAppendTable(cardoon_db, "tasks", new_db_row)
         }
@@ -141,17 +158,6 @@ create_task_object <- function(num_worker = 1L, db_init = FALSE) {
         if (is.na(done)) return(NULL)
         row <- match(done, private$tasks$id)
         result <- private$tasks$result[[row]]
-        # TODO update instead of overwrite because results need to be kept
-        # private$tasks <- private$tasks[-row, ]
-
-
-        # logger::log_info("pop: overwrite DB tasks-table")
-        # DBI::dbWriteTable(
-        #   conn = cardoon_db,
-        #   name = "tasks",
-        #   value = private$tasks,
-        #   overwrite = TRUE)
-
         out <- c(result, list(task_id = done))
         return(out)
       }
@@ -175,18 +181,27 @@ create_task_object <- function(num_worker = 1L, db_init = FALSE) {
         added_rows <- lapply(
           X = seq_len(nrow(task_db)),
           FUN = function(i_task, task_db) {
+
+            # only for "done" jobs the state is set
+            # all others are recalculated: "waiting"
+            this_state <- ifelse(
+              test = task_db$state[i_task] == "done",
+              yes =  "done",
+              no =  "waiting")
+
             self$push(
-              fun = unserialize(charToRaw(task_db$fun[i_task])),
-              args = unserialize(charToRaw(task_db$args[i_task])),
+              fun = unserialize(charToRaw(task_db$fun[i_task]))[[1]],
+              args = unserialize(charToRaw(task_db$args[i_task]))[[1]],
+              result = unserialize(charToRaw(task_db$result[i_task]))[[1]],
               id = task_db$id[i_task],
-              add_db = FALSE
+              add_db = FALSE,
+              state = this_state
             )
           },
           task_db = task_db
         )
 
 
-        # TODO check / remove idle worker rows before saving / loading db
         logger::log_info("start ", concurrency, " workers")
         for (i in seq_len(concurrency)) {
           rs <- callr::r_session$new(wait = FALSE)
@@ -194,8 +209,12 @@ create_task_object <- function(num_worker = 1L, db_init = FALSE) {
           # negative id for worker nodes
           private$tasks <- tibble::add_row(
             private$tasks,
-            id = -i, idle = TRUE, state = "running",
-            fun = list(NULL), args = list(NULL), worker = list(rs),
+            id = -i,
+            idle = TRUE,
+            state = "running",
+            fun = list(NULL),
+            args = list(NULL),
+            worker = list(rs),
             result = list(NULL))
         }
       },

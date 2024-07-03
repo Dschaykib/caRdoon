@@ -168,6 +168,10 @@ my_news$add_bullet(c("fix adding of jobs",
                      "adding utils package as dependency"))
 my_desc$set_dep("utils", type = desc::dep_types[1])
 
+my_desc$bump_version("dev")
+my_news$add_version(my_desc$get_version())
+my_news$add_bullet(c("fix saving of resutls into DB setup",
+                     "adjust DB setup with name and init"))
 
 
 # WIP ---------------------------------------------------------------------

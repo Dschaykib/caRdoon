@@ -43,3 +43,5 @@ aa <- httr::GET(url = "http://127.0.0.1:6303/tasklist")
 
 # JSON example
 # {"func":["function (id = 1, msg = \"done\", log_path = \"\") ","{","    Sys.sleep(runif(1) * 10 + 10)","    out_file <- paste0(log_path, \"logs_\", gsub(\":\", \"\", Sys.time()), ","        \"_id_\", id)","    writeLines(text = paste(id, msg), con = out_file)","    return(iris)","}"],"args_list":{"id":[11],"msg":["KK"],"log_path":["/Users/jakobgepp/Projekte/Intern/caRdoon/logs/"]}}
+
+# {"func": ["function (id = 1) ", "{", "    a <- Sys.sleep(runif(1) * 10 + 10)", "    return(id)", "}" ],"args_list": {"id": [ 11 ] }}

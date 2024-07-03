@@ -3,8 +3,10 @@
 #' @param id integer with the task identifying index
 #' @param fun a function
 #' @param args a list of arguments for the function
-#' @param state a string indicating the status of the job.
-#'  Can be one of "waiting", "idle", "running" or "done"
+#' @param result a list wiht the results of a function. This is used for
+#'   reloading tasks from the DB.
+#' @param state a string indicating the status of the job. Can be one of
+#'   "waiting", "idle", "running" or "done"
 #'
 #' @return a tibble with one row
 #'
@@ -20,8 +22,10 @@ create_row <- function(
     id = 1L,
     state = "waiting",
     fun = function() NULL,
-    args = list(NULL)) {
+    args = NULL,
+    result = NULL) {
 
+  # create new row
   out <- tibble::tibble(
     id = id,
     idle = FALSE,
@@ -29,7 +33,7 @@ create_row <- function(
     fun = list(fun),
     args = list(args),
     worker = list(NULL),
-    result = list(NULL)
+    result = list(result)
   )
   return(out)
 }

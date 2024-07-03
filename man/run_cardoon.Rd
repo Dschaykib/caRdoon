@@ -10,7 +10,9 @@ run_cardoon(
   check_seconds = 10,
   sleep_time = 5,
   docs = FALSE,
-  log_path = "logs/"
+  log_path = "logs/",
+  db_name = "caRdoon_task.sqlite",
+  db_init = FALSE
 )
 }
 \arguments{
@@ -28,6 +30,12 @@ sleeps.}
 
 \item{log_path}{a path to a file where the logs of the backend
 process are stored}
+
+\item{db_name}{a string with the name of the DB file. Should have the suffix
+'.sqlite'}
+
+\item{db_init}{a boolean, if TRUE the task data base is overwritten and newly
+initialized.}
 }
 \value{
 a message, that the API has closed

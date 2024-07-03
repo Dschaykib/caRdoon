@@ -1,6 +1,11 @@
 
 logger::log_info("start API in background")
 log_path <- file.path(getwd(), "temp_log")
+
+if (dir.exists(log_path)) {
+  unlink(log_path, recursive = TRUE)
+}
+
 logger::log_info("log_path: ", log_path)
 log_file <- file.path(
   log_path, paste0("api_log_", format(Sys.time(), "%Y%M%d_%H%M%S"), ".txt")
@@ -16,7 +21,9 @@ rs <- callr::r_bg(
     library(caRdoon)
     run_cardoon(
       port = 8000,
-      log_path = log_path
+      log_path = log_path,
+      db_name = "test_caRdoon_task.sqlite",
+      db_init = TRUE
     )
   },
   args = list(log_path = log_path),

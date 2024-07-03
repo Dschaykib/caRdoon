@@ -8,18 +8,22 @@ create_row(
   id = 1L,
   state = "waiting",
   fun = function() NULL,
-  args = list(NULL)
+  args = NULL,
+  result = NULL
 )
 }
 \arguments{
 \item{id}{integer with the task identifying index}
 
-\item{state}{a string indicating the status of the job.
-Can be one of "waiting", "idle", "running" or "done"}
+\item{state}{a string indicating the status of the job. Can be one of
+"waiting", "idle", "running" or "done"}
 
 \item{fun}{a function}
 
 \item{args}{a list of arguments for the function}
+
+\item{result}{a list wiht the results of a function. This is used for
+reloading tasks from the DB.}
 }
 \value{
 a tibble with one row

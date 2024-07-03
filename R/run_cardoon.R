@@ -12,6 +12,10 @@
 #' @param docs a boolean indicating if the docs should be started.
 #' @param log_path a path to a file where the logs of the backend
 #'  process are stored
+#' @param db_name a string with the name of the DB file. Should have the suffix
+#'   '.sqlite'
+#' @param db_init a boolean, if TRUE the task data base is overwritten and newly
+#'   initialized.
 #'
 #' @import plumber
 #' @import logger
@@ -26,7 +30,9 @@ run_cardoon <- function(
   check_seconds = 10,
   sleep_time = 5,
   docs = FALSE,
-  log_path = "logs/"
+  log_path = "logs/",
+  db_name = "caRdoon_task.sqlite",
+  db_init = FALSE
   ) {
 
   logger::log_info("caRdoon version ", as.character(packageVersion("caRdoon")))
@@ -47,6 +53,8 @@ run_cardoon <- function(
   Sys.setenv(CARDOON_CHECK_SECONDS = check_seconds)
   Sys.setenv(CARDOON_SLEEP_TIME = sleep_time)
   Sys.setenv(CARDOON_LOG_PATH = log_path)
+  Sys.setenv(CARDOON_DB_NAME = db_name)
+  Sys.setenv(CARDOON_DB_INIT = db_init)
 
 
   logger::log_info("start caRdoon API")

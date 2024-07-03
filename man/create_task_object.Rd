@@ -4,13 +4,20 @@
 \alias{create_task_object}
 \title{Create R6 task list object}
 \usage{
-create_task_object(num_worker = 1L, db_init = FALSE)
+create_task_object(
+  num_worker = 1L,
+  db_init = FALSE,
+  db_name = "caRdoon_task.sqlite"
+)
 }
 \arguments{
 \item{num_worker}{integer, the number of worker processes}
 
-\item{db_init}{a boolean, if TRUE the task data base is overwritten
-and newly initialized.}
+\item{db_init}{a boolean, if TRUE the task data base is overwritten and newly
+initialized.}
+
+\item{db_name}{a string with the name of the DB file. Should have the suffix
+'.sqlite'}
 }
 \value{
 an R6 object to track and queue tasks
