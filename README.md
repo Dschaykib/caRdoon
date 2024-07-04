@@ -57,7 +57,7 @@ api_function <- function(id = 1) {
 run_cardoon(port = 8000, api_function = api_function)
 ```
 
-
+Access the API's endpoints from an other R process or start the code above in an R terminal.
 
 The main endpoints are:
 
@@ -68,6 +68,10 @@ This will add a new job to the task list. The added job contains all parameter n
 For example:
 
 ``` R
+
+library(jsonlite)
+library(httr)
+
 # set parameters for simple test function
 this_body <- jsonlite::toJSON(list(
   "args_list" = list(
@@ -85,6 +89,46 @@ httr::POST(url = "http://127.0.0.1:8000/addJob",
 This will return a table with the current jobs and their status.
 
 
+``` R
+
+library(httr)
+api_tasklist <- httr::GET(url = "http://127.0.0.1:8000/tasklist")
+
+# combine the output list into a data.frame
+as.data.frame(do.call(rbind, httr::content(api_tasklist)))
+
+```
+
+Here is an example output with one worker node (id = -1) and three tasks. One is done, one is currently running and one is still waiting.
+
+```
+  id  idle   state
+1  1 FALSE    done
+2  2 FALSE running
+3  3 FALSE waiting
+4 -1  TRUE waiting
+```
+
+
+#### /getResult
+
+This endpoint returns the function's output if it finished successfully. To get specific results the internal `id` is used, which can be received via the `/tasklist` endpoint.
+
+```
+this_body <- jsonlite::toJSON(list("id" =  1))
+
+res_1 <- httr::POST(url = "http://127.0.0.1:8000/getResult",
+                    body = this_body)
+
+httr::content(res_1)
+```
+
+In the simple test function, the random sleeping time is returned:
+
+```
+[[1]]
+[1] 7.8385
+```
 
 # Ideas and TODOs
 

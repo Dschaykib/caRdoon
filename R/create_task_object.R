@@ -168,6 +168,7 @@ create_task_object <- function(
                          nrow(task_db), " tasks")
         private$tasks <- create_row(state = character(0))
         # add initial tasks from DB
+        lapply(
           X = seq_len(nrow(task_db)),
           FUN = function(i_task, task_db) {
 
