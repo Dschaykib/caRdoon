@@ -1,19 +1,9 @@
-testthat::context("API testing")
-
 
 testthat::test_that("local deployment works", {
 
-  logger::log_info("start API in background")
-  rs <- callr::r_bg(
-    function() {
-      caRdoon::run_cardoon(port = 8000)
-    }, package = "caRdoon")
-  print(rs)
-  print(rs$read_output())
-  # wait for API to start
-  Sys.sleep(1)
+  # so that it is available for all tests
 
-  logger::log_info("API ping call")
+  # logger::log_info("API ping call")
   link <- "http://localhost:8000/ping"
   call <- tryCatch(
     httr::GET(url = link),
@@ -23,65 +13,58 @@ testthat::test_that("local deployment works", {
   #   `accept` = 'application/json'),
   # httr::content_type("application/json")
 
-  print(rs$read_output())
-  print(call)
-
   call_parse <- tryCatch(
     httr::content(call, encoding = "UTF-8"),
-    error = function(x) NA)
+    error = function(x) NA
+  )
 
   print(call_parse)
 
   testthat::expect_equal(unlist(call_parse), TRUE)
 
-  rs$kill()
-
 })
 
-testthat::test_that("enpoints have correct format", {
+testthat::test_that("enpoint ping has correct format", {
 
   # this test is done to ensure or at least check for backwards compabilitiy
 
-  logger::log_info("start API in background")
-  rs <- callr::r_bg(
-    function() {
-      caRdoon::run_cardoon(port = 8000)
-    }, package = "caRdoon")
-  print(rs)
-  print(rs$read_output())
-  # wait for API to start
-  Sys.sleep(1)
-
-
   # /ping
-  logger::log_info("test /ping")
+  # logger::log_info("test /ping")
   link <- "http://localhost:8000/ping"
   call <- tryCatch(
     httr::content(httr::GET(url = link), encoding = "UTF-8"),
     error = function(x) NA)
   testthat::expect_type(call[[1]], "logical")
 
+})
+
+testthat::test_that("enpoint version has correct format", {
 
   # /version
-  logger::log_info("test /version ")
+  # logger::log_info("test /version ")
   link <- "http://localhost:8000/version"
   call <- tryCatch(
     httr::content(httr::GET(url = link), encoding = "UTF-8"),
     error = function(x) NA)
   testthat::expect_type(call[[1]], "character")
 
+})
+testthat::test_that("enpoint background has correct format", {
 
   # /background
-  logger::log_info("test /background ")
+  # logger::log_info("test /background ")
   link <- "http://localhost:8000/background"
   call <- tryCatch(
     httr::content(httr::GET(url = link), encoding = "UTF-8"),
     error = function(x) NA)
   testthat::expect_type(call[[1]], "character")
 
+})
+testthat::test_that("enpoint tasklist has correct format", {
+
 
   # /tasklist
-  logger::log_info("test /tasklist ")
+  # logger::log_info("test /tasklist ")
   link <- "http://localhost:8000/tasklist"
   call <- tryCatch(
     httr::content(httr::GET(url = link), encoding = "UTF-8"),
@@ -89,9 +72,14 @@ testthat::test_that("enpoints have correct format", {
   testthat::expect_type(call[[1]], "list")
   testthat::expect_named(call[[1]], c("id", "idle", "state"))
 
+})
+
+
+testthat::test_that("enpoint nextJob has correct format", {
+
 
   # /nextJob
-  logger::log_info("test /nextJob ")
+  # logger::log_info("test /nextJob ")
   link <- "http://localhost:8000/nextJob"
   call <- tryCatch(
     httr::content(httr::GET(url = link), encoding = "UTF-8"),
@@ -100,25 +88,13 @@ testthat::test_that("enpoints have correct format", {
   testthat::expect_type(call, "list")
 
   # /addJob has no return value
-
-  rs$kill()
-
 })
+
 
 testthat::test_that("example function works", {
 
-  logger::log_info("start API in background")
-  rs <- callr::r_bg(
-    function() {
-      caRdoon::run_cardoon(port = 8000)
-    }, package = "caRdoon")
-  print(rs)
-  print(rs$read_output())
-  # wait for API to start
-  Sys.sleep(1)
-
   # the default number of workers is 1
-  logger::log_info("API get tasks before adding jobs")
+  # logger::log_info("API get tasks before adding jobs")
   link <- "http://localhost:8000/tasklist"
   call <- tryCatch(
     httr::content(httr::GET(url = link), encoding = "UTF-8"),
@@ -130,7 +106,7 @@ testthat::test_that("example function works", {
 
   # adding jobs
   foo <- function(id = 1, msg = "done") {
-    Sys.sleep(runif(1))
+    Sys.sleep(2 + runif(1))
     print(msg)
     }
 
@@ -148,7 +124,7 @@ testthat::test_that("example function works", {
 
 
 
-  logger::log_info("API get tasks after adding jobs")
+  # logger::log_info("API get tasks after adding jobs")
   link <- "http://localhost:8000/tasklist"
   call <- tryCatch(
     httr::content(httr::GET(url = link), encoding = "UTF-8"),
@@ -160,7 +136,49 @@ testthat::test_that("example function works", {
   testthat::expect_equal(nrow(call_dt), test_runs + 1)
 
 
-  rs$kill()
+})
+
+
+testthat::test_that("enpoint getResult is an empty list for idle tasks", {
+
+  # /getResult
+  link <- "http://localhost:8000/getResult"
+  # idle task have negative ids
+  this_body <- jsonlite::toJSON(list("id" = -1L))
+
+  api_content <- tryCatch(
+    expr = {
+      api_call <- httr::POST(url = link, body = this_body)
+      httr::content(api_call, encoding = "UTF-8")
+    },
+    error = function(x) NA
+  )
+
+  # returns list() because idle task is never done
+  print(api_content)
+  testthat::expect_type(api_content, "list")
+  testthat::expect_length(api_content, 0)
 
 })
 
+
+testthat::test_that("enpoint getResult is working", {
+
+  # /getResult
+  link <- "http://localhost:8000/getResult"
+  # idle task have negative ids
+  this_body <- jsonlite::toJSON(list("id" = -1L))
+
+  api_content <- tryCatch(
+    expr = {
+      api_call <- httr::POST(url = link, body = this_body)
+      httr::content(api_call, encoding = "UTF-8")
+    },
+    error = function(x) NA
+  )
+
+  # returns list() because idle task is never done
+  testthat::expect_type(api_content, "list")
+  testthat::expect_length(api_content, 0)
+
+})

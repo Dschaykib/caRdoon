@@ -7,26 +7,43 @@
 run_cardoon(
   port = 9662,
   num_worker = 1,
-  check_seconds = 60,
-  sleep_time = 10,
-  docs = FALSE
+  check_seconds = 10,
+  sleep_time = 5,
+  docs = FALSE,
+  log_path = "logs/",
+  db_name = "caRdoon_task.sqlite",
+  db_init = FALSE,
+  api_function
 )
 }
 \arguments{
-\item{port}{integer with the port, the API should run on}
+\item{port}{integer with the port, the API should run on.}
 
-\item{num_worker}{integer with number of worker processes}
+\item{num_worker}{integer with number of worker processes.}
 
-\item{check_seconds}{integer with number of seconds before the background process checks if the API is still alive}
+\item{check_seconds}{integer with number of seconds before the background
+process checks if the API is still alive.}
 
-\item{sleep_time}{integer with the number of seconds the background process sleeps}
+\item{sleep_time}{integer with the number of seconds the background process
+sleeps.}
 
-\item{docs}{a boolean indicating if the docs should be started}
+\item{docs}{a boolean indicating if the docs should be started.}
+
+\item{log_path}{a path to a file where the logs of the backend
+process are stored}
+
+\item{db_name}{a string with the name of the DB file. Should have the suffix
+'.sqlite'}
+
+\item{db_init}{a boolean, if TRUE the task data base is overwritten and newly
+initialized.}
+
+\item{api_function}{a function that is evaluated at each API call.}
 }
 \value{
 a message, that the API has closed
 }
 \description{
-Running this function will create the caRdoon API.
-The API acts as a task queue with multiple workers in the background.
+Running this function will create the caRdoon API. The API acts
+  as a task queue with multiple workers in the background.
 }

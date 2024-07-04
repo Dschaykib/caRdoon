@@ -2,5 +2,7 @@
 ^renv\.lock$
 ^.*\.Rproj$
 ^\.Rproj\.user$
-
+^.*.sqlite
 ^misc
+^.lintr
+^temp_log/

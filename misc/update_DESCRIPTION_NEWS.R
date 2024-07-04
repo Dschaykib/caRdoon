@@ -4,11 +4,6 @@
 unlink("DESCRIPTION")
 unlink("NEWS.md")
 
-# update renv packages if needed
-renv::clean()
-renv::snapshot(prompt = TRUE)
-
-
 # initial files -----------------------------------------------------------
 
 # Create a new description object
@@ -114,6 +109,10 @@ my_desc$set_dep("jsonlite", type = desc::dep_types[3], version = "*")
 my_news$add_bullet(c("update tests and logging",
                      "fix typos"))
 
+# bump to minor version ---------------------------------------------------
+
+my_desc$bump_version("patch")
+my_news$add_version(my_desc$get_version())
 
 
 # minor docu fixes --------------------------------------------------------
@@ -125,14 +124,62 @@ my_news$add_bullet(c("update documentation",
                      "fix bug with number of workers",
                      "fix typos"))
 
+# add database for storage ------------------------------------------------
 
-# bump to minor version ---------------------------------------------------
-
-my_desc$bump_version("patch")
+my_desc$bump_version("minor")
 my_news$add_version(my_desc$get_version())
 
+my_news$add_bullet(c("add RSQLite database to store queue and results",
+                     "refactor background process"))
+
+my_desc$set_dep("DBI", type = desc::dep_types[1])
+my_desc$set_dep("RSQLite", type = desc::dep_types[1])
 
 
+# fix DB setup --------------------------------------------------------
+
+my_desc$bump_version("dev")
+my_news$add_version(my_desc$get_version())
+my_desc$set_dep("lintr", type = desc::dep_types[3])
+my_desc$set_dep("withr", type = desc::dep_types[3])
+
+my_news$add_bullet(c("refactor DB setup and tests",
+                     "add lintr and withr"))
+
+# fix DB setup --------------------------------------------------------
+
+my_desc$bump_version("dev")
+my_news$add_version(my_desc$get_version())
+my_news$add_bullet(c("adjust logging"))
+
+my_desc$bump_version("dev")
+my_news$add_version(my_desc$get_version())
+my_news$add_bullet(c("fix id type to numeric"))
+
+my_desc$bump_version("dev")
+my_news$add_version(my_desc$get_version())
+my_news$add_bullet(c("add DB updates for status",
+                     "update .lintr options"))
+
+
+my_desc$bump_version("dev")
+my_news$add_version(my_desc$get_version())
+my_news$add_bullet(c("fix adding of jobs",
+                     "adding utils package as dependency"))
+my_desc$set_dep("utils", type = desc::dep_types[1])
+
+my_desc$bump_version("dev")
+my_news$add_version(my_desc$get_version())
+my_news$add_bullet(c("fix saving of resutls into DB setup",
+                     "adjust DB setup with name and init"))
+
+# fix DB setup --------------------------------------------------------
+
+my_desc$bump_version("minor")
+my_news$add_version(my_desc$get_version())
+
+my_news$add_bullet(
+  c("api function is now set during api startup and not during runtime"))
 
 # WIP ---------------------------------------------------------------------
 
@@ -171,11 +218,28 @@ my_readme[1] <- paste0(
 writeLines(my_readme, "README.md")
 
 
+# pkg builds and checks ---------------------------------------------------
+
+# update renv packages if needed
+renv::clean()
+renv::snapshot(prompt = TRUE, exclude = "caRdoon")
+
 # set pkg names
 origin::originize_pkg()
+
+# check lints
+lintr::lint_package()
 
 # update documentation
 roxygen2::roxygenise()
 # tidy DESCRIPTON
 usethis::use_tidy_description()
 
+# clean and install package!
+utils::menu(
+  choices = c("Yes", "No"),
+  title = "Did you press 'clean and install' yet?"
+)
+
+# check package structure
+devtools::check(document = FALSE)
