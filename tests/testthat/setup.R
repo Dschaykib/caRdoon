@@ -16,17 +16,25 @@ if (!dir.exists(log_path)) {
   dir.create(log_path, recursive = TRUE)
 }
 
+# simple test function
+api_function <- function(id = 1, ...) {
+  sleep <- runif(1) * 10 + id
+  Sys.sleep(sleep)
+  return(sleep)
+}
+
 rs <- callr::r_bg(
-  func = function(log_path) {
+  func = function(log_path, api_function) {
     library(caRdoon)
     run_cardoon(
       port = 8000,
       log_path = log_path,
       db_name = "test_caRdoon_task.sqlite",
-      db_init = TRUE
+      db_init = TRUE,
+      api_function = api_function
     )
   },
-  args = list(log_path = log_path),
+  args = list(log_path = log_path, api_function = api_function),
   package = "caRdoon",
   stdout = log_file,
   stderr = log_file,

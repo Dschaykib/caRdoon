@@ -9,6 +9,7 @@
 #'   '.sqlite'
 #' @param db_init a boolean, if TRUE the task data base is overwritten and newly
 #'   initialized.
+#' @param api_function function that is used and evaluated in each api call
 #'
 #' @import R6
 #' @import callr
@@ -24,7 +25,8 @@
 create_task_object <- function(
     num_worker = 1L,
     db_init = FALSE,
-    db_name = "caRdoon_task.sqlite") {
+    db_name = "caRdoon_task.sqlite",
+    api_function) {
 
   # add to avoids notes in package checks
   private <- NA
@@ -38,16 +40,6 @@ create_task_object <- function(
   cardoon_db <- DBI::dbConnect(RSQLite::SQLite(), db_name)
   #cardoon_db <- DBI::dbConnect(RSQLite::SQLite(),"inst/plumber/cardoon/caRdoon_task.sqlite")
 
-  # # create empty db format for initialization
-  # empty_db <- data.frame(
-  #   id = NA_integer_,
-  #   idle = NA,
-  #   state = NA_character_,
-  #   fun = NA_character_,
-  #   args = NA_character_,
-  #   worker = NA_character_,
-  #   result = NA_character_
-  # )[0,]
 
   db_list <- DBI::dbListTables(cardoon_db)
   if (length(db_list) == 0 || !("tasks" %in% db_list) || db_init) {
@@ -87,8 +79,7 @@ create_task_object <- function(
       get_num_done = function() sum(private$tasks$state == "done"),
       is_idle = function() sum(!private$tasks$idle) == 0,
 
-      push = function(fun,
-                      args = list(),
+      push = function(args = list(),
                       result = NULL,
                       id = NULL,
                       add_db = TRUE,
@@ -103,7 +94,6 @@ create_task_object <- function(
         # add row to DB and use empty_db function to create a new row
         new_row <- create_row(
           id = id,
-          fun = fun,
           args = args,
           result = result,
           state = state)
@@ -178,7 +168,6 @@ create_task_object <- function(
                          nrow(task_db), " tasks")
         private$tasks <- create_row(state = character(0))
         # add initial tasks from DB
-        added_rows <- lapply(
           X = seq_len(nrow(task_db)),
           FUN = function(i_task, task_db) {
 
@@ -190,7 +179,6 @@ create_task_object <- function(
               no =  "waiting")
 
             self$push(
-              fun = unserialize(charToRaw(task_db$fun[i_task]))[[1]],
               args = unserialize(charToRaw(task_db$args[i_task]))[[1]],
               result = unserialize(charToRaw(task_db$result[i_task]))[[1]],
               id = task_db$id[i_task],
@@ -212,7 +200,6 @@ create_task_object <- function(
             id = -i,
             idle = TRUE,
             state = "running",
-            fun = list(NULL),
             args = list(NULL),
             worker = list(rs),
             result = list(NULL))
@@ -278,7 +265,7 @@ create_task_object <- function(
         lapply(waiting, function(i) {
           if (!private$tasks$idle[i]) {
             private$tasks$worker[[i]]$call(
-              private$tasks$fun[[i]],
+              api_function,
               private$tasks$args[[i]])
           }
         })

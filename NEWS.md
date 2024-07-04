@@ -1,40 +1,16 @@
-## version 0.1.0.9005
+## version 0.2.0
 
 ---
 
+- api function is now set during api startup and not during runtime
 - fix saving of resutls into DB setup
 - adjust DB setup with name and init
-
-## version 0.1.0.9004
-
----
-
 - fix adding of jobs
 - adding utils package as dependency
-
-## version 0.1.0.9003
-
----
-
 - add DB updates for status
 - update .lintr options
-
-## version 0.1.0.9002
-
----
-
 - fix id type to numeric
-
-## version 0.1.0.9001
-
----
-
 - adjust logging
-
-## version 0.1.0.9000
-
----
-
 - refactor DB setup and tests
 - add lintr and withr
 

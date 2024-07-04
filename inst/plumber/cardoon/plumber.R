@@ -1,8 +1,21 @@
-api_version <- "0.1.0.9005"
+api_version <- "0.2.0"
 # this need to be in the first line, since it is updated automatically
 # via `misc/update_DESCRIPTION_NEWS.R`
 
+
+# create default function if it does not exit for local development and testing
+# the api_function is used from the parent environment in run_cardoon()
+
 library(caRdoon)
+
+if (!exists("api_function")) {
+  api_function <- function(id = 1, ...) {
+    sleep <- runif(1) * 10 + id
+    Sys.sleep(sleep)
+    return(sleep)
+  }
+}
+
 
 # loads the port from the global env, which was set within run_cardoon()
 api_port <- Sys.getenv("CARDOON_PORT", "8000")
@@ -32,7 +45,8 @@ logger::log_info("setup R6 object")
 task_q <- caRdoon:::create_task_object(
   num_worker = num_worker,
   db_init = db_init,
-  db_name = db_name)
+  db_name = db_name,
+  api_function = api_function)
 q <- task_q$new()
 
 
@@ -83,7 +97,7 @@ function() {
 
 # test function and data
 # foo <- function(
-#     id = 1,
+    #     id = 1,
 #     msg = "done",
 #     log_path = "") {
 #
@@ -104,21 +118,16 @@ function() {
 # ))
 
 #* Add a new job to the list
-#* @param data:object an object with func and args_list
+#* @param data:object an object with args_list that contains all
+#*  needed parameters for the used api function
 #* @post /addJob
 function(req) {
-  # , data = example_data
-  # cat("addJob:", ids, "\n")
 
   data <- req$argsBody
-  func <- eval(parse(text = data$func))
 
-  if (is.null(func)) {
-    print("no function found in $func")
-  } else {
-    q$push(fun = func, args = data$args_list)
-    print("done addJob")
-  }
+  q$push(args = data$args_list)
+  print("done addJob")
+
 }
 
 

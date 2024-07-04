@@ -1,7 +1,6 @@
 #' helper function to create a new row for the task queue
 #'
 #' @param id integer with the task identifying index
-#' @param fun a function
 #' @param args a list of arguments for the function
 #' @param result a list wiht the results of a function. This is used for
 #'   reloading tasks from the DB.
@@ -14,14 +13,13 @@
 #'
 #' caRdoon:::create_row()
 #' # A tibble: 1 × 7
-#' #    id idle  state   fun    args       worker result
-#' #  <int> <lgl> <chr>   <list> <list>     <list> <list>
-#' #1     1 FALSE waiting <fn>   <list [1]> <NULL> <NULL>
+#' #     id idle  state     args     worker result
+#' #  <int> <lgl> <chr>   <list>     <list> <list>
+#' #1     1 FALSE waiting <list [1]> <NULL> <NULL>
 #'
 create_row <- function(
     id = 1L,
     state = "waiting",
-    fun = function() NULL,
     args = NULL,
     result = NULL) {
 
@@ -30,7 +28,6 @@ create_row <- function(
     id = id,
     idle = FALSE,
     state = state,
-    fun = list(fun),
     args = list(args),
     worker = list(NULL),
     result = list(result)

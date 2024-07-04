@@ -16,6 +16,7 @@
 #'   '.sqlite'
 #' @param db_init a boolean, if TRUE the task data base is overwritten and newly
 #'   initialized.
+#' @param api_function a function that is evaluated at each API call.
 #'
 #' @import plumber
 #' @import logger
@@ -32,10 +33,9 @@ run_cardoon <- function(
   docs = FALSE,
   log_path = "logs/",
   db_name = "caRdoon_task.sqlite",
-  db_init = FALSE
+  db_init = FALSE,
+  api_function
   ) {
-
-  logger::log_info("caRdoon version ", as.character(packageVersion("caRdoon")))
 
   # TODO add logging within API on different levels (info, debug, ...)
   # TODO add timestamp to logfile per default
@@ -44,6 +44,15 @@ run_cardoon <- function(
   # TODO check what happens to the background process if API process is killed
 
   # https://community.rstudio.com/t/plumber-api-and-package-structure/18099/11
+
+
+  logger::log_info("caRdoon version ", as.character(packageVersion("caRdoon")))
+
+
+  # validate api_function
+  if (!is.function(api_function)) {
+    stop("'api_function' should be an R function")
+  }
 
   logger::log_info("set env vars for caRdoon API")
   # set the API port and number of workers as a global env, so that the
@@ -57,8 +66,9 @@ run_cardoon <- function(
   Sys.setenv(CARDOON_DB_INIT = db_init)
 
 
+
   logger::log_info("start caRdoon API")
-  plumber::plumb_api(package = "caRdoon", name = "cardoon") %>%
+  plumber::plumb_api(package = "caRdoon", name = "cardoon") |>
     plumber::pr_hook(
       stage = "exit",
       # naming is done later in plumber.R
@@ -67,7 +77,7 @@ run_cardoon <- function(
         # DBI::dbDisconnect(cardoon_db)
         logger::log_info("closing DB done")
       }
-    ) %>%
+    ) |>
     plumber::pr_run(
       # manually set port
       port = port,

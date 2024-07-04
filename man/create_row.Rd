@@ -4,21 +4,13 @@
 \alias{create_row}
 \title{helper function to create a new row for the task queue}
 \usage{
-create_row(
-  id = 1L,
-  state = "waiting",
-  fun = function() NULL,
-  args = NULL,
-  result = NULL
-)
+create_row(id = 1L, state = "waiting", args = NULL, result = NULL)
 }
 \arguments{
 \item{id}{integer with the task identifying index}
 
 \item{state}{a string indicating the status of the job. Can be one of
 "waiting", "idle", "running" or "done"}
-
-\item{fun}{a function}
 
 \item{args}{a list of arguments for the function}
 
@@ -35,8 +27,8 @@ helper function to create a new row for the task queue
 
 caRdoon:::create_row()
 # A tibble: 1 × 7
-#    id idle  state   fun    args       worker result
-#  <int> <lgl> <chr>   <list> <list>     <list> <list>
-#1     1 FALSE waiting <fn>   <list [1]> <NULL> <NULL>
+#     id idle  state     args     worker result
+#  <int> <lgl> <chr>   <list>     <list> <list>
+#1     1 FALSE waiting <list [1]> <NULL> <NULL>
 
 }

@@ -1,4 +1,4 @@
-# :leafy_green: caRdoon - 0.1.0.9005 <img src="misc/cardoon.png" width=170 align="right" />
+# :leafy_green: caRdoon - 0.2.0 <img src="misc/cardoon.png" width=170 align="right" />
 
 A task queue API for R roughly based on functionality of [celery](https://github.com/celery/celery).
 
@@ -8,7 +8,7 @@ Source: [Wikipedia](https://en.wikipedia.org/wiki/Cardoon)
 
 # Disclaimer
 
-This is still work in progress and functionality, parameters and such might change.
+This is still work in progress and functionality or parameters might change.
 
 # Installation
 
@@ -20,42 +20,58 @@ library(caRdoon)
 
 # Motivation
 
-When building dashboard, calling an model API in the back-end is quite common. If the model takes a while to compute, most users want to know when there task is done or being processed. One solution is a task queue like [celery](https://github.com/celery/celery). Since this is sometime an overkill for small projects, I had the idea to build something similar. I came across this [blog post](https://www.tidyverse.org/blog/2019/09/callr-task-q/) and decided to wrap this all together into a small little package.
+I have build quite a few R Shiny apps and most of them had some kind of API connection to run a model in the background (e.g. for some forcasting). If the model takes a while to compute, one questions arises: "What does the user do in the meantime?"
+
+Most important, the app should not be blocked. So if the user wants to do some other tasks or checks in the app, they should be able to. You could use [promises with the future package](https://rstudio.github.io/promises/articles/promises_06_shiny.html) or use R background processes. Both of these are valid solutions, but I also had the additional 'requirement' that the user wants to know the status of their long running task.
+
+To solve this, I took inspiration from [celery](https://github.com/celery/celery) and [this blog post](https://www.tidyverse.org/blog/2019/09/callr-task-q/) to create caRdoon – a task queue API for R.
 
 
-# Setup
+# TLDR
 
-The target setup looks like this:
+You need to provide a function to the API during startup. This function is now called and executed for each task you add with `/addJob` and the given parameters.
+You can get an overview of all task by calling `/tasklist` and receive each functions result with `/getResult`.
+
+
+
+# Background Setup
+
+The background setup looks like this:
 <img src="misc/target-setup.png" align="center" />
 
 
 # Usage
 
-The package provides the setup described above. To start the local API use the function `run_cardoon(port = 8000)` and specify the port, the API should run at.
+The package provides the setup described above. To start the local API use the function `run_cardoon()` and set the `api_function`. Check out `help(run_cardoon, "caRdoon")` for more details.
+
+```
+library(caRdoon)
+
+# simple test function
+api_function <- function(id = 1) {
+  sleep <- runif(1) * 10 + id
+  Sys.sleep(sleep)
+  return(sleep)
+}
+
+run_cardoon(port = 8000, api_function = api_function)
+```
+
+
+
 The main endpoints are:
 
 #### /addJob
 
-This will add a new job to the task list. The added job is a function `func` which needs all parameter given via `args_list`. Since the process is spawned in a separate R process in the background, it does not have access to the global environment.
-
-At the moment, the results are not saved or stored. Therefore, the given function is responsible to save the output or logs.
+This will add a new job to the task list. The added job contains all parameter needed for the current api function in `args_list`. Since the process is spawned in a separate R process in the background, it does not have access to the global environment. The results of each function are stored in a database.
 
 For example:
 
 ``` R
-# create a function
-foo <- function(id = 1, msg = "done") {
-  Sys.sleep(runif(1))
-  out_file <- paste0("logs_", gsub(":", "", Sys.time()), "_id_", id)
-  writeLines(text = paste(id, msg), con = out_file)
-}
-
+# set parameters for simple test function
 this_body <- jsonlite::toJSON(list(
-  "func" = foo,
   "args_list" = list(
-    "id" =  1,
-    "msg" = "finished"
-    
+    "id" =  2
   )
 ))
 
@@ -85,7 +101,7 @@ First a small working package is planed, but there are already ideas floating ar
 - [ ] update README with example output
 - [ ] check if global variables are needed or can be replaced by inputs
 - [ ] add status to API enpoints
-- [ ] refactor so that used function is given at startup time not during run time per API call
+- [x] refactor so that used function is given at startup time not during run time per API call
 - [ ] ...
 
 

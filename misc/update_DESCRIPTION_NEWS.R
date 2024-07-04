@@ -173,6 +173,13 @@ my_news$add_version(my_desc$get_version())
 my_news$add_bullet(c("fix saving of resutls into DB setup",
                      "adjust DB setup with name and init"))
 
+# fix DB setup --------------------------------------------------------
+
+my_desc$bump_version("minor")
+my_news$add_version(my_desc$get_version())
+
+my_news$add_bullet(
+  c("api function is now set during api startup and not during runtime"))
 
 # WIP ---------------------------------------------------------------------
 

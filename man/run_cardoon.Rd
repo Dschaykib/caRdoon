@@ -12,7 +12,8 @@ run_cardoon(
   docs = FALSE,
   log_path = "logs/",
   db_name = "caRdoon_task.sqlite",
-  db_init = FALSE
+  db_init = FALSE,
+  api_function
 )
 }
 \arguments{
@@ -36,6 +37,8 @@ process are stored}
 
 \item{db_init}{a boolean, if TRUE the task data base is overwritten and newly
 initialized.}
+
+\item{api_function}{a function that is evaluated at each API call.}
 }
 \value{
 a message, that the API has closed
