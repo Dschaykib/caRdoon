@@ -37,7 +37,7 @@ You can get an overview of all task by calling `/tasklist` and receive each func
 # Background Setup
 
 The background setup looks like this:
-<img src="misc/target-setup.png" align="center" />
+<img src="misc/targetsetup.png" align="center" />
 
 
 # Usage
