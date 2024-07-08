@@ -20,7 +20,7 @@ library(caRdoon)
 
 # Motivation
 
-I have build quite a few R Shiny apps and most of them had some kind of API connection to run a model in the background (e.g. for some forcasting). If the model takes a while to compute, one questions arises: "What does the user do in the meantime?"
+I have built quite a few R Shiny apps and most of them had some kind of API connection to run a model in the background (e.g. for some forecasting). If the model takes a while to compute, one questions arises: "What does the user do in the meantime?"
 
 Most important, the app should not be blocked. So if the user wants to do some other tasks or checks in the app, they should be able to. You could use [promises with the future package](https://rstudio.github.io/promises/articles/promises_06_shiny.html) or use R background processes. Both of these are valid solutions, but I also had the additional 'requirement' that the user wants to know the status of their long running task.
 
@@ -37,6 +37,8 @@ You can get an overview of all task by calling `/tasklist` and receive each func
 # Background Setup
 
 The background setup looks like this:
+
+
 <img src="misc/targetsetup.png" align="center" />
 
 
